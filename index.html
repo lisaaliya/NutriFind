@@ -3,553 +3,1276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NutriFind - Temukan Resep Sehatmu</title>
-    <style>
-        /* --- CSS VARIABLES (COLOR PALETTE) --- */
-        :root {
-            --primary-sage: #8A9A5B;
-            --dark-sage: #5F6F45;
-            --cream-bg: #F9F7F2;
-            --text-dark: #2F4F4F;
-            --accent-orange: #E2725B;
-            --white: #FFFFFF;
-        }
-
-        /* --- RESET & BASIC STYLES --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--cream-bg); color: var(--text-dark); line-height: 1.6; }
-
-        /* --- HEADER & HERO --- */
-        header {
-            background-color: var(--white);
-            padding: 20px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-sage); letter-spacing: 1px; }
-        
-        .hero {
-            text-align: center;
-            padding: 80px 20px;
-            background: linear-gradient(rgba(47, 79, 79, 0.1), rgba(47, 79, 79, 0.1)), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
-            color: var(--text-dark);
-            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7);
-        }
-        .hero h1 { font-size: 3rem; margin-bottom: 10px; }
-        .hero p { font-size: 1.2rem; margin-bottom: 30px; font-weight: 500; background-color: rgba(255,255,255,0.8); display: inline-block; padding: 5px 15px; border-radius: 20px;}
-
-        /* --- SEARCH SECTION --- */
-        .search-container {
-            background: var(--white);
-            max-width: 900px;
-            margin: -40px auto 40px;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        .search-title { text-align: center; margin-bottom: 20px; color: var(--dark-sage); }
-        
-        .filter-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-        
-        select {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-            width: 180px;
-            transition: border-color 0.2s;
-        }
-        select:focus { border-color: var(--primary-sage); }
-
-        .search-input-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .search-input-group input {
-            flex-grow: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        .btn-search {
-            background-color: var(--primary-sage);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: 0.3s;
-            /* display: block; */
-            /* margin: 20px auto 0; */
-            /* width: 100%; */
-            /* max-width: 250px; */
-        }
-        .btn-search:hover { background-color: var(--dark-sage); transform: translateY(-2px); }
-
-        /* --- RECIPE GRID --- */
-        .results-section { padding: 20px 5%; max-width: 1200px; margin: 0 auto; }
-        .section-heading { margin-bottom: 20px; color: var(--dark-sage); font-size: 1.8rem; }
-        
-        .recipe-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .recipe-card {
-            background: var(--white);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: 0.3s;
-            border: 1px solid #eee;
-            cursor: pointer;
-        }
-        .recipe-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
-        
-        .card-img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background-color: #ddd;
-        }
-        
-        .card-body { padding: 20px; }
-        .diet-tag {
-            background-color: #E8F5E9;
-            color: var(--dark-sage);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-        .recipe-title { font-size: 1.25rem; margin-bottom: 10px; color: var(--text-dark); }
-        .nutrition-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 15px;
-            background: #f4f4f4;
-            padding: 8px;
-            border-radius: 8px;
-        }
-        .nutrition-info span { flex: 1; text-align: center; }
-        .nutrition-info span:not(:last-child) { border-right: 1px solid #ddd; }
-
-
-        .card-footer {
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .price { color: var(--accent-orange); font-weight: bold; }
-        .btn-detail {
-            color: var(--primary-sage);
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        /* --- FOOTER --- */
-        footer {
-            background-color: var(--text-dark);
-            color: white;
-            text-align: center;
-            padding: 30px;
-            margin-top: 50px;
-        }
-        .creator-note {
-            font-size: 0.8rem;
-            margin-top: 10px;
-            color: #ccc;
-        }
-
-        /* ------------------ MODAL STYLES (NEW) ------------------ */
-        .modal {
-            display: none; 
-            position: fixed;
-            z-index: 999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            padding-top: 60px;
-        }
-        .modal-content {
-            background-color: var(--white);
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
-            animation-name: animatetop;
-            animation-duration: 0.4s;
-        }
-        @keyframes animatetop {
-            from {top: -300px; opacity: 0}
-            to {top: 0; opacity: 1}
-        }
-        .close-btn {
-            color: #aaa;
-            float: right;
-            font-size: 30px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-        }
-        .close-btn:hover, .close-btn:focus {
-            color: var(--accent-orange);
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .detail-info {
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-        .detail-info h4 {
-            color: var(--dark-sage);
-            margin-top: 15px;
-            margin-bottom: 5px;
-            border-bottom: 2px solid var(--primary-sage);
-            display: inline-block;
-            padding-bottom: 2px;
-        }
-        .nutrition-detail-box {
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            margin-bottom: 15px;
-            background-color: #f8f8f8;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: bold;
-        }
-        .nutrition-detail-box div {
-            text-align: center;
-        }
-        .nutrition-detail-box span {
-            display: block;
-            font-weight: normal;
-            color: #666;
-            font-size: 0.85rem;
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="logo">NutriFind.</div>
-        <nav>
-            <a href="#" style="color:var(--text-dark); text-decoration:none; margin-left: 20px;">Home</a>
-            <a href="#" style="color:var(--text-dark); text-decoration:none; margin-left: 20px;">Langganan</a>
-        </nav>
-    </header>
-
-    <div class="hero">
-        <h1>Masak Cerdas, Hidup Sehat</h1>
-        <p>Solusi Anak Kost: Input bahan sisa, dapatkan resep bergizi.</p>
-    </div>
-
-    <div class="search-container">
-        <h3 class="search-title">Apa yang ada di kulkasmu hari ini?</h3>
-        
-        <div class="filter-group">
-            <select id="inputHewani">
-                <option value="">Protein Hewani...</option>
-                <option value="telur">Telur</option>
-                <option value="ayam">Dada Ayam</option>
-                <option value="sarden">Ikan Sarden</option>
-                <option value="ikan">Ikan Tongkol</option>
-                <option value="udang">Udang</option>
-                <option value="daging">Daging Sapi</option>
-            </select>
-            
-            <select id="inputNabati">
-                <option value="">Protein Nabati...</option>
-                <option value="tempe">Tempe</option>
-                <option value="tahu">Tahu</option>
-                <option value="kacang">Kacang Hijau</option>
-                <option value="edamame">Edamame</option>
-                <option value="jamur">Jamur</option>
-            </select>
-
-            <select id="inputSayur">
-                <option value="">Pilih Sayur...</option>
-                <option value="bayam">Bayam</option>
-                <option value="wortel">Wortel</option>
-                <option value="brokoli">Brokoli</option>
-                <option value="kol">Kol</option>
-                <option value="tomat">Tomat</option>
-                <option value="kangkung">Kangkung</option>
-                <option value="timun">Timun</option>
-                <option value="cabai">Cabai</option>
-            </select>
-
-            <select id="inputKarbo">
-                <option value="">Pilih Karbo...</option>
-                <option value="nasi">Nasi Putih</option>
-                <option value="kentang">Kentang</option>
-                <option value="oat">Oatmeal</option>
-                <option value="mie">Mie Instan</option>
-                <option value="pasta">Pasta</option>
-                <option value="roti">Roti</option>
-                <option value="ubi">Ubi</option>
-                <option value="jagung">Jagung</option>
-            </select>
-        </div>
-        
-        <div class="search-input-group">
-            <input type="text" id="inputKeyword" placeholder="Cari resep cepat, low carb, pedas, dll..." onkeyup="cariResep()">
-            <button class="btn-search" onclick="cariResep()">Cari</button>
-        </div>
-        
-    </div>
-
-    <div class="results-section">
-        <h2 class="section-heading">Rekomendasi Menu</h2>
-        <div class="recipe-grid" id="recipeContainer">
-            </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2024 NutriFind. Teman Sehat Anak Kost.</p>
-        <p class="creator-note">Original Content & Concept by Lisa Aliya</p>
-    </footer>
-
-    <div id="recipeModal" class="modal" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle"></h2>
-            <div id="modalBody"></div>
-        </div>
-    </div>
+    <title>NutriFind by Lisa Aliya - Smart Recipe Finder</title>
     
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Babel untuk compile JSX di browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <script>
-        // Database Resep NutriFind (60 Resep)
-        // Creator: Lisa Aliya
-        const recipes = [
-            // Resep 1-5 (Diberi contoh keyword baru, Resep 6-60 memiliki struktur yang sama)
-            { id: 1, title: "Tumis Telur Bayam Hemat", hewan: "telur", nabati: "", sayur: "bayam", karbo: "nasi", image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=500&q=60", tags: "Diet Hemat | Low Carb", calories: 350, protein_val: 18, fat_val: 15, carbs_val: 35, price: "Rp 12.000", desc: "Menu akhir bulan kaya zat besi dan vitamin, sangat cepat dibuat.", benefit: "Tinggi zat besi & Vitamin K (Bayam).", bahan: "2 butir telur, 1 ikat bayam, 2 siung bawang putih, nasi 100g.", cara: "1. Tumis bawang putih hingga harum. 2. Masukkan bayam, masak sebentar. 3. Masukkan telur, orak-arik hingga matang. 4. Bumbui garam/lada. Sajikan dengan nasi.", keywords: ["hemat", "cepat", "sayuran", "orak-arik", "telur", "bayam"] },
-            { id: 2, title: "Steak Tempe Saus Lada Hitam", hewan: "", nabati: "tempe", sayur: "wortel", karbo: "kentang", image: "https://asset.kompas.com/crops/O_KxP8e3Xl-lHtyD4C_-dK0i2sI=/0x0:1000x667/750x500/data/photo/2020/11/04/5fa2307d0c3c9.jpg", tags: "Vegan | Muscle", calories: 420, protein_val: 25, fat_val: 18, carbs_val: 40, price: "Rp 10.000", desc: "Pengganti daging yang murah meriah namun tinggi protein nabati.", benefit: "Protein nabati tinggi, rendah kolesterol.", bahan: "1/2 papan tempe, 1 buah kentang rebus, 1 buah wortel kukus, saus lada hitam instan.", cara: "1. Potong tempe tebal, lumuri bumbu. Panggang/goreng di teflon. 2. Tata kentang dan wortel. 3. Siram dengan saus lada hitam.", keywords: ["vegan", "protein", "murah", "panggang", "tempe", "lada hitam"] },
-            { id: 3, title: "Sup Ayam Jahe Anti-Flu", hewan: "ayam", nabati: "", sayur: "wortel", karbo: "nasi", image: "https://images.unsplash.com/photo-1547592166-23acbe3a624b?auto=format&fit=crop&w=500&q=60", tags: "High Protein | Immunity", calories: 450, protein_val: 35, fat_val: 10, carbs_val: 55, price: "Rp 20.000", desc: "Kuah hangat yang cocok saat musim hujan atau badan kurang fit, sangat berkhasiat.", benefit: "Meningkatkan imun tubuh (Jahe) & Pemulihan (Protein Ayam).", bahan: "100g dada ayam, 1 buah wortel, jahe, air, nasi.", cara: "1. Rebus ayam hingga matang, suwir. 2. Masukkan wortel dan jahe geprek ke dalam kuah kaldu. 3. Bumbui garam/lada. Sajikan dengan nasi.", keywords: ["hangat", "kuah", "jahe", "flu", "sakit", "ayam", "recovery"] },
-            { id: 4, title: "Nasi Gila Sarden + Kol (Rice Cooker)", hewan: "sarden", nabati: "", sayur: "kol", karbo: "nasi", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60", tags: "Praktis Cepat | Budget", calories: 480, protein_val: 22, fat_val: 20, carbs_val: 50, price: "Rp 15.000", desc: "Resep satu panci (rice cooker) super praktis, rasa mewah.", benefit: "Omega-3 dari sarden kaleng. Anti Ribet.", bahan: "1 kaleng sarden kecil, 1/4 buah kol iris, 1 porsi nasi matang, bawang/cabai (opsional).", cara: "1. Tumis bumbu (jika ada). Masukkan sarden dan kol, masak hingga layu. 2. Campurkan dengan nasi matang. Aduk rata. 3. Masukkan kembali ke rice cooker dalam mode 'Keep Warm' sebentar.", keywords: ["praktis", "rice cooker", "sarden", "kol", "nasi", "instan"] },
-            { id: 5, title: "Omelette Tahu Brokoli", hewan: "telur", nabati: "tahu", sayur: "brokoli", karbo: "kentang", image: "https://images.unsplash.com/photo-1582239615598-a3f81e626cc9?auto=format&fit=crop&w=500&q=60", tags: "Breakfast | High Protein", calories: 380, protein_val: 30, fat_val: 22, carbs_val: 25, price: "Rp 11.000", desc: "Sarapan atau makan malam tinggi protein yang padat dan mengenyangkan.", benefit: "Kalsium (Tahu) dan Antioksidan (Brokoli). Cocok untuk diet kenyang.", bahan: "2 butir telur, 1 buah tahu putih, 5 kuntum brokoli kukus, bumbu.", cara: "1. Hancurkan tahu, campur dengan telur, brokoli cincang, dan bumbu. 2. Dadar/goreng di teflon dengan sedikit minyak hingga matang.", keywords: ["sarapan", "omelette", "tahu", "brokoli", "diet", "goreng"] },
-            
-            // ... (Resep 6 hingga 60 DENGAN PENAMBAHAN PROPERTI KEYWORDS)
-            { id: 6, title: "Bubur Kacang Hijau (Simple)", hewan: "", nabati: "kacang", sayur: "", karbo: "nasi", image: "https://images.unsplash.com/photo-1587397750137-b6f8498877f8?auto=format&fit=crop&w=500&q=60", tags: "Dessert | Serat Tinggi", calories: 280, protein_val: 15, fat_val: 5, carbs_val: 45, price: "Rp 8.000", desc: "Camilan sehat/sarapan yang kaya serat dan rendah lemak.", benefit: "Sumber serat tinggi, baik untuk pencernaan dan kenyang lama.", bahan: "100g kacang hijau, gula merah secukupnya, santan instan (1 sdm).", cara: "1. Rebus kacang hijau hingga empuk. 2. Masukkan gula merah dan sedikit garam. 3. Tambahkan 1 sdm santan instan saat disajikan.", keywords: ["bubur", "manis", "kacang", "dessert", "sarapan", "vegan"] },
-            { id: 7, title: "Mie Instan Sehat + Tongkol", hewan: "ikan", nabati: "", sayur: "bayam", karbo: "mie", image: "https://images.unsplash.com/photo-1541249969116-37207624921f?auto=format&fit=crop&w=500&q=60", tags: "Cheat Meal Sehat | Praktis", calories: 520, protein_val: 30, fat_val: 25, carbs_val: 45, price: "Rp 18.000", desc: "Upgrade mie instan agar gizi seimbang. Rasa tetap enak, lebih sehat.", benefit: "Protein lengkap dari ikan dan vitamin dari bayam.", bahan: "1 bungkus mie instan, 1 potong ikan tongkol/cakalang, 1 ikat bayam.", cara: "1. Rebus mie dan bayam secara terpisah. 2. Hangatkan ikan tongkol. 3. Campurkan mie dengan bumbu (kurangi 1/2 bumbu minyaknya). 4. Tata di mangkuk dengan ikan dan bayam.", keywords: ["mie", "praktis", "tongkol", "bayam", "cepat", "sehat"] },
-            { id: 8, title: "Chicken Oatmeal Porridge", hewan: "ayam", nabati: "oat", sayur: "wortel", karbo: "oat", image: "https://images.unsplash.com/photo-1549723377-5264b5840902?auto=format&fit=crop&w=500&q=60", tags: "Low GI | Diet Pagi", calories: 300, protein_val: 28, fat_val: 8, carbs_val: 30, price: "Rp 17.000", desc: "Bubur gurih dari oatmeal, tinggi protein, cocok untuk sarapan diet.", benefit: "Indeks Glikemik rendah (Oatmeal), kenyang lebih lama.", bahan: "100g dada ayam (potong kecil), 5 sdm Oatmeal, 1/2 wortel (cincang), kaldu bubuk.", cara: "1. Rebus ayam dan wortel hingga matang. 2. Masukkan oatmeal dan kaldu bubuk, aduk cepat. 3. Masak sebentar hingga teksturnya seperti bubur.", keywords: ["oatmeal", "diet", "bubur", "gurih", "ayam", "low GI"] },
-            { id: 9, title: "Nasi Goreng Kampung Sehat", hewan: "telur", nabati: "tahu", sayur: "kol", karbo: "nasi", image: "https://images.unsplash.com/photo-1612927230555-d41c19b88496?auto=format&fit=crop&w=500&q=60", tags: "Full Meal | Indonesia", calories: 480, protein_val: 20, fat_val: 15, carbs_val: 65, price: "Rp 14.000", desc: "Nasi goreng tanpa minyak berlebihan, diperkaya tahu dan kol.", benefit: "Makanan lengkap 4 sehat, kaya serat dan protein.", bahan: "1 porsi nasi, 1 butir telur, 1 buah tahu potong dadu, kol iris, kecap asin/manis.", cara: "1. Orak-arik telur, sisihkan. 2. Tumis tahu dan kol hingga layu. 3. Masukkan nasi dan telur orak-arik. Bumbui kecap dan bumbu lain. Masak cepat dengan api besar.", keywords: ["nasi", "goreng", "indonesia", "tahu", "telur", "cepat", "gurih"] },
-            { id: 10, title: "Tuna Mayo Sandwich Panggang", hewan: "ikan", nabati: "", sayur: "tomat", karbo: "roti", image: "https://images.unsplash.com/photo-1619623067140-5e5d3269a840?auto=format&fit=crop&w=500&q=60", tags: "Fast Food Sehat | Satuan", calories: 340, protein_val: 25, fat_val: 18, carbs_val: 20, price: "Rp 16.000", desc: "Roti panggang dengan isian tuna kaleng dan mayo rendah lemak.", benefit: "Tinggi protein (Tuna) dan mudah dibawa (Portable).", bahan: "2 lembar roti gandum, 1/2 kaleng tuna in water, 1 sdm mayonaise rendah lemak, irisan tomat.", cara: "1. Campur tuna dan mayo. 2. Oleskan di roti. Tambahkan irisan tomat. 3. Panggang di teflon/toaster hingga kecoklatan.", keywords: ["roti", "sandwich", "ikan", "tuna", "bekal", "panggang", "cepat"] },
-            { id: 11, title: "Pasta Aglio Olio Tempe", hewan: "", nabati: "tempe", sayur: "brokoli", karbo: "pasta", image: "https://images.unsplash.com/photo-1593361413861-1ac606992d42?auto=format&fit=crop&w=500&q=60", tags: "Budget | Vegetarian", calories: 400, protein_val: 20, fat_val: 15, carbs_val: 50, price: "Rp 15.000", desc: "Resep pasta versi hemat dan sehat, pengganti udang/ayam dengan tempe.", benefit: "Kandungan serat tinggi dari pasta dan brokoli.", bahan: "1 porsi pasta, 50g tempe potong dadu, 5 kuntum brokoli, 2 siung bawang putih, minyak zaitun.", cara: "1. Rebus pasta dan brokoli. 2. Tumis bawang putih dan tempe dengan minyak zaitun. 3. Masukkan pasta dan brokoli. Bumbui lada dan garam. Aduk rata.", keywords: ["pasta", "tempe", "vegetarian", "murah", "brokoli", "italia"] },
-            { id: 12, title: "Semur Tahu Kentang Praktis", hewan: "", nabati: "tahu", sayur: "", karbo: "kentang", image: "https://images.unsplash.com/photo-1547470659-c2998a69a239?auto=format&fit=crop&w=500&q=60", tags: "Comfort Food | Low Fat", calories: 330, protein_val: 22, fat_val: 10, carbs_val: 40, price: "Rp 10.000", desc: "Makanan berkuah manis gurih, cocok sebagai lauk pendamping.", benefit: "Protein nabati dan sumber kalium dari kentang.", bahan: "3 buah tahu cokelat, 1 buah kentang, kecap manis, air.", cara: "1. Rebus/kukus kentang hingga empuk. 2. Masak tahu dan kentang dalam air mendidih. 3. Tambahkan kecap manis, garam, dan lada. Masak hingga kuah mengental.", keywords: ["semur", "tahu", "kuah", "kentang", "praktis", "manis"] },
-            { id: 13, title: "Sup Ayam Sederhana + Brokoli", hewan: "ayam", nabati: "", sayur: "brokoli", karbo: "kentang", image: "https://images.unsplash.com/photo-1588147690186-07f7b163e9f3?auto=format&fit=crop&w=500&q=60", tags: "Sehat | Recovery", calories: 350, protein_val: 30, fat_val: 8, carbs_val: 40, price: "Rp 18.000", desc: "Sup bening ringan, tinggi vitamin dan protein untuk pemulihan.", benefit: "Vitamin C tinggi dari brokoli. Melegakan tenggorokan.", bahan: "70g dada ayam, brokoli, 1 buah kentang, bawang putih, seledri.", cara: "1. Rebus kentang dan ayam. 2. Tumis bawang putih, masukkan ke rebusan. 3. Masukkan brokoli dan bumbu. Masak hingga matang. Taburi seledri.", keywords: ["sup", "ayam", "brokoli", "bening", "sehat", "kuah", "pemulihan"] },
-            { id: 14, title: "Ayam Goreng Tepung Oat", hewan: "ayam", nabati: "oat", sayur: "tomat", karbo: "nasi", image: "https://images.unsplash.com/photo-1627308594248-18e0018d9f1e?auto=format&fit=crop&w=500&q=60", tags: "Crispy Sehat | High Protein", calories: 430, protein_val: 35, fat_val: 12, carbs_val: 50, price: "Rp 22.000", desc: "Ayam goreng dengan balutan tepung dari oatmeal, lebih renyah dan berserat.", benefit: "Protein tinggi tanpa tepung terigu berlebihan. Lebih sehat.", bahan: "1 potong dada ayam, oatmeal (blender halus), telur, tomat, nasi.", cara: "1. Baluri ayam dengan telur, lalu gulingkan ke oatmeal halus. 2. Goreng dengan sedikit minyak atau air fryer. 3. Sajikan dengan nasi dan irisan tomat.", keywords: ["ayam", "goreng", "oatmeal", "crispy", "tepung", "sehat", "protein"] },
-            { id: 15, title: "Scramble Egg & Roti (Simple)", hewan: "telur", nabati: "", sayur: "tomat", karbo: "roti", image: "https://images.unsplash.com/photo-1549488340-d922a000d276?auto=format&fit=crop&w=500&q=60", tags: "Sarapan Cepat | Minimalis", calories: 310, protein_val: 20, fat_val: 15, carbs_val: 25, price: "Rp 9.000", desc: "Menu sarapan / makan malam 5 menit dengan gizi seimbang.", benefit: "Vitamin C dari tomat, protein cepat serap dari telur.", bahan: "2 butir telur, 2 lembar roti, 1 buah tomat, sedikit mentega.", cara: "1. Orak-arik telur di teflon. 2. Panggang roti dengan mentega. 3. Tata telur dan irisan tomat di atas roti.", keywords: ["telur", "roti", "sarapan", "cepat", "minimalis", "orak-arik"] },
-            { id: 16, title: "Salad Ayam Panggang Edamame", hewan: "ayam", nabati: "edamame", sayur: "kol", karbo: "", image: "https://images.unsplash.com/photo-1512621776951-a57143f7e756?auto=format&fit=crop&w=500&q=60", tags: "Low Carb | High Protein", calories: 320, protein_val: 38, fat_val: 10, carbs_val: 20, price: "Rp 25.000", desc: "Salad segar dengan protein tinggi dan serat dari edamame.", benefit: "Protein pembentuk otot dan sumber asam folat.", bahan: "100g dada ayam panggang, 50g edamame rebus, 1 mangkuk kol, dressing mayonaise rendah lemak.", cara: "1. Panggang/rebus dada ayam, potong dadu. 2. Campur kol dan edamame. 3. Tambahkan ayam. 4. Siram dengan dressing.", keywords: ["salad", "ayam", "panggang", "edamame", "low carb", "diet"] },
-            { id: 17, title: "Bubur Jagung Manis Kental", hewan: "", nabati: "", sayur: "jagung", karbo: "jagung", image: "https://images.unsplash.com/photo-1599815410123-c15c8b2a1a2e?auto=format&fit=crop&w=500&q=60", tags: "Sarapan | Fiber", calories: 250, protein_val: 5, fat_val: 5, carbs_val: 50, price: "Rp 9.000", desc: "Makanan manis yang mengenyangkan, menggunakan jagung sebagai karbo dan serat utama.", benefit: "Tinggi serat, baik untuk kesehatan mata.", bahan: "2 buah jagung manis, air, sedikit gula, 1 sdm santan instan.", cara: "1. Serut jagung, blender sebagian, sisanya biarkan utuh. 2. Rebus jagung dengan air hingga mendidih. 3. Tambahkan gula dan santan. Aduk hingga mengental.", keywords: ["bubur", "manis", "jagung", "sarapan", "fiber", "vegetarian"] },
-            { id: 18, title: "Sambal Udang Petai (Diet)", hewan: "udang", nabati: "", sayur: "cabai", karbo: "nasi", image: "https://images.unsplash.com/photo-1627389814421-2a1e0b503e91?auto=format&fit=crop&w=500&q=60", tags: "Pedas | High Protein", calories: 450, protein_val: 30, fat_val: 20, carbs_val: 45, price: "Rp 30.000", desc: "Lauk mewah dengan udang, dimasak tanpa minyak berlebihan.", benefit: "Selenium dan Vitamin B12 dari udang.", bahan: "70g udang, 1 papan petai (opsional), cabai, bumbu sambal, nasi.", cara: "1. Tumis bumbu sambal hingga matang dengan sedikit minyak. 2. Masukkan udang dan petai. Masak hingga berubah warna. 3. Sajikan dengan nasi hangat.", keywords: ["udang", "pedas", "sambal", "tumis", "petai", "mewah"] },
-            { id: 19, title: "Sup Daging Ubi Merah", hewan: "daging", nabati: "", sayur: "wortel", karbo: "ubi", image: "https://images.unsplash.com/photo-1602952865766-3e81d770c0c6?auto=format&fit=crop&w=500&q=60", tags: "Low GI | Comfort", calories: 390, protein_val: 28, fat_val: 10, carbs_val: 45, price: "Rp 28.000", desc: "Sup kaya rasa dengan ubi sebagai pengganti nasi/kentang yang lebih bernutrisi.", benefit: "Vitamin A tinggi (Ubi) dan zat besi (Daging).", bahan: "50g daging sapi, 1 buah ubi merah, 1 buah wortel, kuah kaldu sapi.", cara: "1. Rebus daging hingga empuk, potong dadu. 2. Masukkan wortel dan ubi, masak hingga matang. 3. Bumbui sup. Sajikan hangat.", keywords: ["sup", "daging", "ubi", "kuah", "wortel", "low GI"] },
-            { id: 20, title: "Nasi Uduk Praktis Rice Cooker", hewan: "telur", nabati: "tahu", sayur: "timun", karbo: "nasi", image: "https://images.unsplash.com/photo-1582522712213-94c3d9b015e1?auto=format&fit=crop&w=500&q=60", tags: "Indonesia | Full Meal", calories: 470, protein_val: 20, fat_val: 15, carbs_val: 68, price: "Rp 15.000", desc: "Membuat nasi uduk wangi hanya dengan rice cooker.", benefit: "Makanan lengkap dengan karbo, protein, dan serat.", bahan: "1 cup beras, santan instan, daun salam, lauk: telur rebus, tahu goreng, irisan timun.", cara: "1. Masak beras seperti biasa, tambahkan santan dan daun salam. 2. Sambil menunggu, siapkan lauk (rebus telur, goreng tahu). 3. Sajikan nasi dengan lauk dan timun.", keywords: ["nasi", "uduk", "rice cooker", "praktis", "telur", "tahu", "indonesia"] },
-            { id: 21, title: "Omelette Keju Sayur", hewan: "telur", nabati: "", sayur: "kol", karbo: "roti", image: "https://images.unsplash.com/photo-1549488340-d922a000d276?auto=format&fit=crop&w=500&q=60", tags: "Sarapan Cepat | Protein", calories: 330, protein_val: 24, fat_val: 20, carbs_val: 15, price: "Rp 13.000", desc: "Telur dadar tebal dengan potongan keju dan sayuran sisa.", benefit: "Kalsium dari keju dan protein lengkap.", bahan: "2 butir telur, irisan kol/wortel, keju parut, 2 lembar roti.", cara: "1. Kocok telur, masukkan sayuran dan keju. 2. Dadar di teflon. 3. Sajikan dengan roti panggang.", keywords: ["telur", "omelette", "keju", "roti", "sarapan", "cepat", "dadar"] },
-            { id: 22, title: "Roti Telur Dadar Gulung", hewan: "telur", nabati: "", sayur: "tomat", karbo: "roti", image: "https://images.unsplash.com/photo-1583348128416-01d713919e83?auto=format&fit=crop&w=500&q=60", tags: "Fast Food Sehat | Portable", calories: 280, protein_val: 18, fat_val: 12, carbs_val: 28, price: "Rp 8.000", desc: "Camilan atau bekal yang mudah dibuat dan mengenyangkan.", benefit: "Praktis dan sumber energi cepat.", bahan: "1 butir telur, 1 lembar roti tawar, irisan tomat, sedikit saus.", cara: "1. Kocok telur, dadar tipis. 2. Letakkan roti di atas telur saat masih setengah matang. 3. Tambahkan tomat dan saus, gulung. 4. Potong dan sajikan.", keywords: ["roti", "telur", "bekal", "gulung", "portable", "cepat"] },
-            { id: 23, title: "Tumis Kangkung Terasi", hewan: "ikan", nabati: "", sayur: "kangkung", karbo: "nasi", image: "https://images.unsplash.com/photo-1563829035882-901b0f5b9d3e?auto=format&fit=crop&w=500&q=60", tags: "Side Dish | Detox", calories: 320, protein_val: 10, fat_val: 8, carbs_val: 50, price: "Rp 10.000", desc: "Lauk sayuran cepat masak yang kaya akan vitamin K.", benefit: "Tinggi zat besi dan vitamin A/K.", bahan: "1 ikat kangkung, terasi, cabai (opsional), nasi.", cara: "1. Tumis bumbu (terasi, cabai, bawang) hingga harum. 2. Masukkan kangkung. Masak sebentar (jangan terlalu layu). 3. Sajikan dengan nasi.", keywords: ["kangkung", "tumis", "terasi", "sayur", "cepat", "pedas"] },
-            { id: 24, title: "Mie Goreng Shirataki (Low Carb)", hewan: "ayam", nabati: "jamur", sayur: "kol", karbo: "mie", image: "https://images.unsplash.com/photo-1543888764-70014b62848c?auto=format&fit=crop&w=500&q=60", tags: "Keto Friendly | Low Carb", calories: 250, protein_val: 25, fat_val: 10, carbs_val: 15, price: "Rp 35.000", desc: "Alternatif mie yang sangat rendah karbohidrat dan tinggi serat.", benefit: "Sangat cocok untuk diet ketogenik atau rendah gula.", bahan: "1 bungkus mie shirataki, 50g dada ayam, jamur iris, kol, kecap rendah gula.", cara: "1. Tumis ayam dan jamur. 2. Masukkan mie shirataki yang sudah direbus dan diiris. 3. Tambahkan kol, bumbu, dan kecap rendah gula. Masak cepat.", keywords: ["mie", "shirataki", "low carb", "keto", "diet", "ayam", "jamur"] },
-            { id: 25, title: "Tahu Telur Kuah Kacang", hewan: "telur", nabati: "tahu", sayur: "timun", karbo: "kentang", image: "https://images.unsplash.com/photo-1568461706788-b2959a7216a7?auto=format&fit=crop&w=500&q=60", tags: "Vegetarian | Budget", calories: 400, protein_val: 28, fat_val: 25, carbs_val: 30, price: "Rp 12.000", desc: "Makanan khas Jawa Timur yang mengenyangkan dan kaya protein nabati.", benefit: "Protein double dari tahu dan telur. Tinggi antioksidan (kacang).", bahan: "1 buah tahu, 1 butir telur, 1 buah kentang rebus, timun, bumbu kacang instan.", cara: "1. Goreng tahu. Dadar telur. 2. Tata tahu, telur, kentang, dan irisan timun. 3. Siram dengan bumbu kacang yang sudah dihangatkan.", keywords: ["tahu", "telur", "kacang", "kuah", "indonesia", "vegetarian"] },
-            { id: 26, title: "Smoothie Bowl Pisang Oat", hewan: "", nabati: "oat", sayur: "bayam", karbo: "oat", image: "https://images.unsplash.com/photo-1507048332168-522f18370724?auto=format&fit=crop&w=500&q=60", tags: "Sarapan Cepat | Vegan", calories: 300, protein_val: 10, fat_val: 5, carbs_val: 55, price: "Rp 15.000", desc: "Sarapan super cepat yang menyembunyikan sayuran (bayam) tanpa merusak rasa.", benefit: "Serat, kalium, dan energi tahan lama.", bahan: "5 sdm oatmeal, 1 buah pisang beku, 5 lembar bayam, air/susu kedelai.", cara: "1. Blender semua bahan hingga halus. 2. Sajikan dalam mangkuk. Tambahkan topping (chia seed/kacang).", keywords: ["smoothie", "sarapan", "cepat", "vegan", "oat", "bayam", "manis"] },
-            { id: 27, title: "Ayam Saus Kecap Ubi", hewan: "ayam", nabati: "", sayur: "", karbo: "ubi", image: "https://images.unsplash.com/photo-1546083819-21c605d8f6cc?auto=format&fit=crop&w=500&q=60", tags: "Full Meal | Low GI", calories: 410, protein_val: 35, fat_val: 10, carbs_val: 45, price: "Rp 23.000", desc: "Ayam yang dimasak dengan saus kecap manis gurih, pendamping ubi.", benefit: "Karbohidrat kompleks dari ubi.", bahan: "100g dada ayam, 1 buah ubi kuning, kecap manis, bawang bombay.", cara: "1. Rebus/kukus ubi. 2. Tumis ayam dan bawang bombay. 3. Tambahkan kecap manis dan air. Masak hingga mengental. 4. Sajikan dengan ubi.", keywords: ["ayam", "kecap", "ubi", "gurih", "tumis", "low GI"] },
-            { id: 28, title: "Gado-Gado Tahu Kentang", hewan: "telur", nabati: "tahu", sayur: "kol", karbo: "kentang", image: "https://images.unsplash.com/photo-1518175510693-393f6b9076b1?auto=format&fit=crop&w=500&q=60", tags: "Vegetarian | Balance", calories: 380, protein_val: 20, fat_val: 25, carbs_val: 30, price: "Rp 15.000", desc: "Salad Indonesia lengkap dengan protein, sayur, dan karbo.", benefit: "Kaya serat, antioksidan, dan nutrisi mikro.", bahan: "Tahu goreng, kentang rebus, telur rebus, kol, bumbu kacang.", cara: "1. Tata semua bahan di piring. 2. Siram dengan bumbu kacang instan yang sudah dicairkan. 3. Taburi bawang goreng (opsional).", keywords: ["gado-gado", "salad", "indonesia", "tahu", "telur", "kentang", "kacang"] },
-            { id: 29, title: "Tumis Sapi Lada Hitam", hewan: "daging", nabati: "jamur", sayur: "cabai", karbo: "nasi", image: "https://images.unsplash.com/photo-1546083819-21c605d8f6cc?auto=format&fit=crop&w=500&q=60", tags: "High Protein | Full Meal", calories: 510, protein_val: 40, fat_val: 20, carbs_val: 45, price: "Rp 35.000", desc: "Masakan cepat saji dengan daging premium dan jamur.", benefit: "Protein pembangun otot dan Vitamin B.", bahan: "80g daging sapi iris, jamur, bawang bombay, cabai, saus lada hitam instan, nasi.", cara: "1. Tumis bawang bombay hingga layu. 2. Masukkan daging, masak hingga berubah warna. 3. Tambahkan jamur dan saus lada hitam. Masak sebentar. Sajikan dengan nasi.", keywords: ["daging", "sapi", "lada hitam", "tumis", "premium", "jamur", "cepat"] },
-            { id: 30, title: "Pasta Carbonara Sehat Ayam", hewan: "ayam", nabati: "", sayur: "brokoli", karbo: "pasta", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60", tags: "Fusion | High Cal", calories: 550, protein_val: 35, fat_val: 25, carbs_val: 50, price: "Rp 25.000", desc: "Pasta creamy versi lebih sehat, menggunakan susu rendah lemak dan dada ayam.", benefit: "Kalsium dan Protein yang mengenyangkan.", bahan: "1 porsi pasta, 100g dada ayam, susu UHT low fat, brokoli, keju parut.", cara: "1. Rebus pasta dan brokoli. 2. Tumis ayam, sisihkan. 3. Panaskan susu, masukkan keju, aduk. 4. Campur pasta, brokoli, dan ayam dengan saus krim.", keywords: ["pasta", "carbonara", "ayam", "creamy", "brokoli", "keju", "fusion"] },
-            { id: 31, title: "Edamame Rebus + Ikan Tongkol", hewan: "ikan", nabati: "edamame", sayur: "", karbo: "nasi", image: "https://images.unsplash.com/photo-1549723377-5264b5840902?auto=format&fit=crop&w=500&q=60", tags: "Minimalis | Clean Eating", calories: 380, protein_val: 32, fat_val: 10, carbs_val: 40, price: "Rp 15.000", desc: "Menu diet super cepat dan bersih. Edamame sebagai pengganti sayur.", benefit: "Protein tinggi dan serat. Anti ribet.", bahan: "1 porsi nasi, 1 porsi edamame, 1 potong ikan tongkol kukus/bakar.", cara: "1. Rebus edamame (atau microwave). 2. Hangatkan ikan. 3. Sajikan langsung bersama nasi.", keywords: ["ikan", "edamame", "minimalis", "clean eating", "diet", "cepat"] },
-            { id: 32, title: "Tumis Tahu Jamur Cabai", hewan: "", nabati: "tahu", sayur: "jamur", karbo: "nasi", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60", tags: "Vegetarian | Hot & Spicy", calories: 350, protein_val: 20, fat_val: 12, carbs_val: 45, price: "Rp 10.000", desc: "Masakan vegetarian yang pedas, gurih, dan cepat saji.", benefit: "Sumber Vitamin D (Jamur) dan Protein Nabati (Tahu).", bahan: "1 buah tahu, jamur tiram, cabai, bawang, nasi.", cara: "1. Tumis cabai dan bawang. 2. Masukkan tahu dan jamur. 3. Bumbui dengan garam, lada, dan sedikit kecap asin. 4. Sajikan dengan nasi.", keywords: ["tahu", "jamur", "tumis", "pedas", "vegetarian", "cepat"] },
-            { id: 33, title: "Ubi Kukus Keju Susu", hewan: "", nabati: "", sayur: "", karbo: "ubi", image: "https://images.unsplash.com/photo-1563829035882-901b0f5b9d3e?auto=format&fit=crop&w=500&q=60", tags: "Snack | Dessert", calories: 280, protein_val: 8, fat_val: 10, carbs_val: 45, price: "Rp 9.000", desc: "Camilan manis dan bergizi yang mudah dibuat di kost.", benefit: "Karbohidrat yang kompleks dan vitamin A.", bahan: "1 buah ubi, susu kental manis (1 sdm), keju parut (1 sdm).", cara: "1. Kukus ubi hingga matang, kupas. 2. Parut ubi (opsional), atau sajikan utuh. 3. Taburi keju parut dan siram sedikit susu kental manis.", keywords: ["ubi", "kukus", "manis", "snack", "keju", "dessert"] },
-            { id: 34, title: "Daging Sapi Brokoli Saus Tiram", hewan: "daging", nabati: "", sayur: "brokoli", karbo: "nasi", image: "https://images.unsplash.com/photo-1627389814421-2a1e0b503e91?auto=format&fit=crop&w=500&q=60", tags: "High Protein | Diet", calories: 480, protein_val: 45, fat_val: 18, carbs_val: 35, price: "Rp 38.000", desc: "Menu premium tinggi protein dengan sayuran hijau.", benefit: "Zat besi (Daging) dan Vitamin C (Brokoli).", bahan: "80g daging sapi, 1 mangkuk brokoli, saus tiram, nasi.", cara: "1. Tumis daging hingga matang. Angkat. 2. Tumis brokoli hingga agak layu. 3. Masukkan kembali daging dan saus tiram. Aduk rata. 4. Sajikan dengan nasi.", keywords: ["daging", "sapi", "brokoli", "tumis", "saus tiram", "protein"] },
-            { id: 35, title: "Telur Ceplok Cabai Simpel", hewan: "telur", nabati: "", sayur: "cabai", karbo: "nasi", image: "https://images.unsplash.com/photo-1549488340-d922a000d276?auto=format&fit=crop&w=500&q=60", tags: "Super Praktis | Hemat", calories: 330, protein_val: 15, fat_val: 18, carbs_val: 30, price: "Rp 8.000", desc: "Solusi cepat saat lapar tengah malam. Pedas dan mengenyangkan.", benefit: "Protein instan. Meningkatkan metabolisme (Cabai).", bahan: "2 butir telur, cabai iris, kecap asin, nasi.", cara: "1. Goreng telur ceplok hingga matang. 2. Angkat. Taburi dengan cabai iris dan kecap asin. 3. Sajikan dengan nasi.", keywords: ["telur", "ceplok", "cabai", "hemat", "praktis", "pedas", "goreng"] },
-            { id: 36, title: "Capcay Jamur Tahu Kuah", hewan: "", nabati: "jamur", sayur: "wortel", karbo: "nasi", image: "https://images.unsplash.com/photo-1596489397635-c331a98e8748?auto=format&fit=crop&w=500&q=60", tags: "Vegetarian | Kuah Hangat", calories: 370, protein_val: 15, fat_val: 10, carbs_val: 55, price: "Rp 14.000", desc: "Sayuran berkuah kental, cocok untuk menghangatkan badan.", benefit: "Kaya serat dan Vitamin A.", bahan: "1 buah tahu, 100g jamur, 1 buah wortel, sawi/kol, tepung maizena, nasi.", cara: "1. Tumis bawang putih. 2. Masukkan wortel, jamur, dan sayuran lain, tambahkan sedikit air. 3. Masukkan tahu, bumbui. 4. Kentalkan dengan larutan maizena. Sajikan dengan nasi.", keywords: ["capcay", "kuah", "jamur", "tahu", "sayur", "hangat", "vegetarian"] },
-            { id: 37, title: "Sop Ikan Sarden Tomat", hewan: "sarden", nabati: "", sayur: "tomat", karbo: "kentang", image: "https://images.unsplash.com/photo-1518175510693-393f6b9076b1?auto=format&fit=crop&w=500&q=60", tags: "Protein Cepat | Kuah Asam", calories: 390, protein_val: 25, fat_val: 15, carbs_val: 40, price: "Rp 18.000", desc: "Sop ikan sarden kalengan yang di-upgrade dengan rasa segar tomat.", benefit: "Omega-3 dan Likopen (tomat).", bahan: "1 kaleng sarden, 2 buah tomat, kentang rebus, daun bawang, air.", cara: "1. Rebus air, masukkan irisan tomat dan daun bawang. 2. Masukkan sarden kaleng, masak sebentar. 3. Bumbui garam/lada. Sajikan dengan kentang rebus.", keywords: ["sop", "sarden", "ikan", "kuah", "cepat", "tomat", "kentang"] },
-            { id: 38, title: "Nasi Ayam Saus Padang (Air Fryer)", hewan: "ayam", nabati: "", sayur: "kol", karbo: "nasi", image: "https://images.unsplash.com/photo-1627389814421-2a1e0b503e91?auto=format&fit=crop&w=500&q=60", tags: "High Protein | Pedas", calories: 500, protein_val: 40, fat_val: 15, carbs_val: 55, price: "Rp 25.000", desc: "Dada ayam renyah tanpa minyak, disiram saus pedas gurih.", benefit: "Tinggi protein tanpa lemak jenuh berlebihan.", bahan: "100g dada ayam, tepung bumbu, saus padang instan, kol, nasi.", cara: "1. Baluri ayam dengan tepung. Air fryer/panggang hingga matang. 2. Tumis sebentar saus padang instan. 3. Siram ayam dengan saus. Sajikan dengan irisan kol dan nasi.", keywords: ["ayam", "saus", "padang", "air fryer", "pedas", "protein", "nasi"] },
-            { id: 39, title: "Mie Goreng Sayur Edamame", hewan: "telur", nabati: "edamame", sayur: "kol", karbo: "mie", image: "https://images.unsplash.com/photo-1541249969116-37207624921f?auto=format&fit=crop&w=500&q=60", tags: "Mie Upgrade | Serat", calories: 530, protein_val: 20, fat_val: 20, carbs_val: 70, price: "Rp 15.000", desc: "Mie goreng yang diperkaya serat dan protein dari edamame.", benefit: "Lebih bergizi dibanding mie goreng biasa. Tinggi Serat.", bahan: "1 bungkus mie instan, 1 butir telur, edamame rebus, kol, kecap.", cara: "1. Rebus mie, tiriskan. 2. Orak-arik telur, masukkan edamame dan kol. 3. Masukkan mie dan bumbu. Aduk rata. Sajikan.", keywords: ["mie", "goreng", "edamame", "telur", "kol", "instan", "serat"] },
-            { id: 40, title: "Roti Panggang Keju Brokoli", hewan: "", nabati: "", sayur: "brokoli", karbo: "roti", image: "https://images.unsplash.com/photo-1549488340-d922a000d276?auto=format&fit=crop&w=500&q=60", tags: "Sarapan Cepat | Vegetarian", calories: 290, protein_val: 15, fat_val: 15, carbs_val: 30, price: "Rp 10.000", desc: "Roti panggang dengan topping keju leleh dan brokoli.", benefit: "Kalsium (Keju) dan Vitamin C (Brokoli).", bahan: "2 lembar roti, keju, brokoli kukus cincang, sedikit mentega.", cara: "1. Campur keju parut dengan brokoli cincang. 2. Oles roti dengan mentega, beri campuran topping. 3. Panggang di teflon/toaster hingga keju meleleh.", keywords: ["roti", "panggang", "keju", "brokoli", "sarapan", "cepat", "vegetarian"] },
-            { id: 41, title: "Ubi Kayu Rebus Bumbu Kacang", hewan: "", nabati: "kacang", sayur: "", karbo: "ubi", image: "https://images.unsplash.com/photo-1547470659-c2998a69a239?auto=format&fit=crop&w=500&q=60", tags: "Jajanan Sehat | Vegan", calories: 350, protein_val: 12, fat_val: 18, carbs_val: 45, price: "Rp 9.000", desc: "Ubi sebagai karbohidrat kompleks, dicocol bumbu kacang gurih.", benefit: "Karbohidrat kompleks yang dicerna perlahan.", bahan: "1 buah ubi kayu, bumbu kacang instan (encerkan dengan air panas).", cara: "1. Rebus/kukus ubi hingga empuk. Kupas. 2. Encerkan bumbu kacang. 3. Sajikan ubi dengan cocolan bumbu kacang.", keywords: ["ubi", "rebus", "kacang", "vegan", "snack", "jajanan"] },
-            { id: 42, title: "Nasi Lodeh Tempe Cabe Hijau", hewan: "", nabati: "tempe", sayur: "cabai", karbo: "nasi", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60", tags: "Indonesia | Vegetarian", calories: 420, protein_val: 20, fat_val: 15, carbs_val: 58, price: "Rp 12.000", desc: "Sayur tempe kuah santan (instan) yang gurih.", benefit: "Kalsium dan Protein dari tempe.", bahan: "1/4 papan tempe, santan instan, cabai hijau besar, nasi.", cara: "1. Tumis bumbu lodeh (bawang, cabai). 2. Masukkan tempe dan air santan. Masak hingga mendidih. 3. Bumbui. Sajikan dengan nasi.", keywords: ["tempe", "lodeh", "kuah", "cabai", "vegetarian", "indonesia"] },
-            { id: 43, title: "Bayam Bening Kuah Kaldu Ayam", hewan: "ayam", nabati: "", sayur: "bayam", karbo: "kentang", image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=500&q=60", tags: "Recovery | Low Fat", calories: 280, protein_val: 25, fat_val: 5, carbs_val: 35, price: "Rp 15.000", desc: "Sup bayam yang ringan dan kaya nutrisi, diperkuat kaldu ayam.", benefit: "Zat besi tinggi dan Vitamin K.", bahan: "1 ikat bayam, kaldu ayam (dari rebusan ayam), kentang rebus/kukus.", cara: "1. Rebus bayam sebentar dalam kaldu ayam. 2. Bumbui garam/lada. 3. Sajikan dengan potongan dada ayam dan kentang.", keywords: ["bayam", "sup", "kuah", "ayam", "recovery", "bening"] },
-            { id: 44, title: "Daging Rebus Saus Bawang", hewan: "daging", nabati: "", sayur: "tomat", karbo: "kentang", image: "https://images.unsplash.com/photo-1602952865766-3e81d770c0c6?auto=format&fit=crop&w=500&q=60", tags: "High Protein | Low Carb", calories: 430, protein_val: 40, fat_val: 20, carbs_val: 25, price: "Rp 35.000", desc: "Daging sapi yang direbus dan disajikan dengan saus bawang putih.", benefit: "Zat Besi dan protein murni.", bahan: "80g daging sapi, bawang putih cincang, tomat iris, kentang kukus.", cara: "1. Rebus daging hingga empuk, iris tipis. 2. Tumis bawang putih dengan sedikit mentega, sisihkan. 3. Tata daging, kentang, dan tomat. Siram dengan tumisan bawang.", keywords: ["daging", "sapi", "rebus", "low carb", "kentang", "bawang"] },
-            { id: 45, title: "Nasi Tim Tahu Jagung", hewan: "telur", nabati: "tahu", sayur: "jagung", karbo: "nasi", image: "https://images.unsplash.com/photo-1582522712213-94c3d9b015e1?auto=format&fit=crop&w=500&q=60", tags: "Comfort Food | Tekstur Lembut", calories: 410, protein_val: 25, fat_val: 12, carbs_val: 55, price: "Rp 16.000", desc: "Nasi yang dimasak lembek bersama isian. Cocok untuk perut sensitif.", benefit: "Mudah dicerna dan bergizi seimbang.", bahan: "1 porsi nasi, tahu hancur, jagung manis, kaldu, 1 butir telur.", cara: "1. Campur nasi, tahu, jagung, dan kaldu di mangkuk. 2. Kukus hingga menjadi nasi tim. 3. Sajikan dengan orak-arik telur.", keywords: ["nasi", "tim", "kukus", "tahu", "jagung", "telur", "lembut"] },
-            { id: 46, title: "Smoothie Ubi Coklat", hewan: "", nabati: "oat", sayur: "", karbo: "ubi", image: "https://images.unsplash.com/photo-1507048332168-522f18370724?auto=format&fit=crop&w=500&q=60", tags: "Dessert | Pre-Workout", calories: 380, protein_val: 10, fat_val: 5, carbs_val: 75, price: "Rp 14.000", desc: "Minuman tebal dari ubi dan cokelat. Karbohidrat cepat serap.", benefit: "Energi instan dan antioksidan.", bahan: "1 buah ubi ungu/kuning kukus, 5 sdm oatmeal, bubuk cokelat tanpa gula, susu low fat, es batu.", cara: "1. Blender semua bahan hingga halus dan kental. 2. Tuang ke gelas. Sajikan.", keywords: ["smoothie", "ubi", "coklat", "oat", "manis", "blend", "vegan"] },
-            { id: 47, title: "Tumis Udang Kangkung Bawang Putih", hewan: "udang", nabati: "", sayur: "kangkung", karbo: "nasi", image: "https://images.unsplash.com/photo-1563829035882-901b0f5b9d3e?auto=format&fit=crop&w=500&q=60", tags: "High Protein | Cepat Saji", calories: 400, protein_val: 30, fat_val: 10, carbs_val: 50, price: "Rp 25.000", desc: "Lauk kombinasi udang dan kangkung, cepat dimasak.", benefit: "Iodin (Udang) dan Vitamin K (Kangkung).", bahan: "50g udang kupas, 1 ikat kangkung, bawang putih, nasi.", cara: "1. Tumis bawang putih hingga harum. 2. Masukkan udang, masak hingga berubah warna. 3. Masukkan kangkung. Masak sebentar. Bumbui. 4. Sajikan dengan nasi.", keywords: ["udang", "kangkung", "tumis", "cepat", "protein", "seafood"] },
-            { id: 48, title: "Pasta Mie Carbonara Keju", hewan: "telur", nabati: "", sayur: "brokoli", karbo: "pasta", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60", tags: "Comfort Food | Fusion", calories: 580, protein_val: 25, fat_val: 30, carbs_val: 55, price: "Rp 18.000", desc: "Mengganti pasta dengan mie instan, tetap creamy dan enak.", benefit: "Kalsium tinggi dari keju dan protein.", bahan: "1 bungkus mie instan, 1 butir telur, keju parut, susu, brokoli rebus.", cara: "1. Rebus mie dan brokoli. Tiriskan. 2. Campur kuning telur dan keju parut di mangkuk. 3. Campur mie hangat ke campuran telur/keju. Aduk cepat hingga creamy. 4. Tambahkan brokoli.", keywords: ["mie", "pasta", "carbonara", "keju", "telur", "creamy", "fusion"] },
-            { id: 49, title: "Nasi Telur Ceplok Kuah Kecap", hewan: "telur", nabati: "", sayur: "tomat", karbo: "nasi", image: "https://images.unsplash.com/photo-1549488340-d922a000d276?auto=format&fit=crop&w=500&q=60", tags: "Minimalis | Hemat", calories: 380, protein_val: 18, fat_val: 15, carbs_val: 45, price: "Rp 8.000", desc: "Resep andalan anak kost. Lebih nikmat dengan irisan tomat segar.", benefit: "Protein cepat saji dan karbohidrat.", bahan: "2 butir telur, kecap manis, irisan tomat, nasi.", cara: "1. Goreng telur ceplok. 2. Tumis bawang merah/putih (opsional), tambahkan kecap dan sedikit air. Masak hingga mendidih. 3. Siram telur ceplok dengan kuah kecap. Sajikan dengan nasi dan tomat.", keywords: ["telur", "ceplok", "nasi", "kecap", "kuah", "hemat", "minimalis"] },
-            { id: 50, title: "Tahu Goreng Bumbu Merah", hewan: "", nabati: "tahu", sayur: "cabai", karbo: "nasi", image: "https://images.unsplash.com/photo-1582239615598-a3f81e626cc9?auto=format&fit=crop&w=500&q=60", tags: "Pedas | Vegan", calories: 360, protein_val: 20, fat_val: 15, carbs_val: 40, price: "Rp 10.000", desc: "Tahu goreng dengan balutan sambal praktis.", benefit: "Protein nabati dan sumber kalsium.", bahan: "1 buah tahu, bumbu sambal/cabai, nasi.", cara: "1. Goreng tahu hingga matang. 2. Ulek cabai dan bawang (atau gunakan sambal instan). 3. Tumis sambal sebentar. 4. Masukkan tahu, aduk rata. Sajikan dengan nasi.", keywords: ["tahu", "goreng", "sambal", "pedas", "vegan", "cepat"] },
-            { id: 51, title: "Tuna Aglio Olio (Low Fat)", hewan: "ikan", nabati: "", sayur: "cabai", karbo: "pasta", image: "https://images.unsplash.com/photo-1593361413861-1ac606992d42?auto=format&fit=crop&w=500&q=60", tags: "High Protein | Diet Dinner", calories: 420, protein_val: 30, fat_val: 15, carbs_val: 45, price: "Rp 20.000", desc: "Pasta dengan tuna kaleng dan minyak zaitun. Praktis dan sehat.", benefit: "Asam lemak Omega-3 dan Protein tinggi.", bahan: "1 porsi pasta, 1/2 kaleng tuna in water, bawang putih, cabai rawit, minyak zaitun.", cara: "1. Rebus pasta. 2. Tumis bawang putih dan cabai dengan minyak zaitun. 3. Masukkan tuna, aduk sebentar. 4. Masukkan pasta, bumbui. Aduk rata.", keywords: ["pasta", "ikan", "tuna", "aglio olio", "low fat", "diet", "cepat"] },
-            { id: 52, title: "Nasi Ayam Saus Tomat", hewan: "ayam", nabati: "", sayur: "tomat", karbo: "nasi", image: "https://images.unsplash.com/photo-1627308594248-18e0018d9f1e?auto=format&fit=crop&w=500&q=60", tags: "Comfort Food | Daily Meal", calories: 460, protein_val: 35, fat_val: 15, carbs_val: 50, price: "Rp 20.000", desc: "Dada ayam yang dimasak dengan saus tomat klasik.", benefit: "Protein untuk recovery dan Vitamin C.", bahan: "100g dada ayam, saus tomat, 2 buah tomat, nasi.", cara: "1. Goreng/panggang ayam. Potong. 2. Tumis bawang bombay (opsional), masukkan saus dan irisan tomat. 3. Masukkan ayam. Masak hingga saus meresap. 4. Sajikan dengan nasi.", keywords: ["ayam", "saus", "tomat", "nasi", "gurih", "tumis"] },
-            { id: 53, title: "Oatmeal Gurih Orak-Arik Telur", hewan: "telur", nabati: "oat", sayur: "", karbo: "oat", image: "https://images.unsplash.com/photo-1549723377-5264b5840902?auto=format&fit=crop&w=500&q=60", tags: "Sarapan Diet | Low GI", calories: 340, protein_val: 25, fat_val: 15, carbs_val: 30, price: "Rp 12.000", desc: "Oatmeal yang dimasak seperti bubur gurih, tinggi protein.", benefit: "Indeks Glikemik rendah, kenyang lebih lama, protein tinggi.", bahan: "5 sdm oatmeal, 1 butir telur, kaldu bubuk, lada.", cara: "1. Masak oatmeal dengan air/susu tawar dan kaldu bubuk hingga tekstur bubur. 2. Orak-arik telur di teflon. 3. Campur oatmeal dan telur. Bumbui lada/garam. Sajikan.", keywords: ["oatmeal", "gurih", "telur", "sarapan", "low GI", "bubur", "diet"] },
-            { id: 54, title: "Sup Jamur Pedas Nasi", hewan: "", nabati: "jamur", sayur: "cabai", karbo: "nasi", image: "https://images.unsplash.com/photo-1596489397635-c331a98e8748?auto=format&fit=crop&w=500&q=60", tags: "Vegetarian | Immune Booster", calories: 350, protein_val: 15, fat_val: 10, carbs_val: 55, price: "Rp 10.000", desc: "Sup jamur pedas yang menghangatkan dan meningkatkan imun.", benefit: "Vitamin D tinggi (Jamur) dan efek anti-inflamasi (Cabai).", bahan: "100g jamur, cabai, bawang, kaldu sayur, nasi.", cara: "1. Tumis bawang dan cabai hingga harum. 2. Masukkan jamur dan kaldu sayur. 3. Masak hingga mendidih dan bumbui. Sajikan dengan nasi.", keywords: ["sup", "jamur", "pedas", "kuah", "vegetarian", "nasi"] },
-            { id: 55, title: "Roti Coklat Keju Ubi", hewan: "", nabati: "", sayur: "", karbo: "roti", image: "https://images.unsplash.com/photo-1583348128416-01d713919e83?auto=format&fit=crop&w=500&q=60", tags: "Snack | Manis", calories: 310, protein_val: 8, fat_val: 12, carbs_val: 45, price: "Rp 8.000", desc: "Camilan manis dengan ubi sebagai isian tambahan.", benefit: "Serat dan karbohidrat yang mengenyangkan.", bahan: "2 lembar roti, ubi kukus halus, keju, meses/cokelat.", cara: "1. Haluskan ubi kukus. 2. Oleskan ubi di roti, taburi keju dan meses. 3. Panggang di teflon hingga kecoklatan.", keywords: ["roti", "ubi", "manis", "snack", "keju", "coklat", "panggang"] },
-            { id: 56, title: "Gulai Ayam Ubi (Simple)", hewan: "ayam", nabati: "", sayur: "", karbo: "ubi", image: "https://images.unsplash.com/photo-1627308594248-18e0018d9f1e?auto=format&fit=crop&w=500&q=60", tags: "Indonesia | High Protein", calories: 450, protein_val: 38, fat_val: 15, carbs_val: 40, price: "Rp 28.000", desc: "Gulai ayam tanpa nasi, menggunakan ubi sebagai karbohidrat utama.", benefit: "Protein dan Kalium (Ubi).", bahan: "100g dada ayam, 1 buah ubi, bumbu gulai instan, santan.", cara: "1. Rebus ayam dan ubi hingga matang. 2. Masukkan bumbu gulai instan dan santan. 3. Masak hingga kuah mengental dan bumbu meresap.", keywords: ["gulai", "ayam", "ubi", "indonesia", "kuah", "protein"] },
-            { id: 57, title: "Oseng Tahu Sawi Putih", hewan: "telur", nabati: "tahu", sayur: "kol", karbo: "nasi", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60", tags: "Sehat | Cepat Saji", calories: 360, protein_val: 22, fat_val: 10, carbs_val: 50, price: "Rp 12.000", desc: "Lauk sayuran yang cepat dan kaya serat, dipadukan tahu.", benefit: "Kaya serat dan Vitamin K.", bahan: "1 buah tahu, 1/4 sawi putih (kol), 1 butir telur, nasi.", cara: "1. Tumis bawang putih, masukkan tahu, orak-arik telur. 2. Masukkan sawi/kol. Masak hingga layu. Bumbui. 3. Sajikan dengan nasi.", keywords: ["tahu", "telur", "tumis", "kol", "cepat", "sehat", "orak-arik"] },
-            { id: 58, title: "Nasi Ikan Panggang Saus Kecap", hewan: "ikan", nabati: "", sayur: "timun", karbo: "nasi", image: "https://images.unsplash.com/photo-1563829035882-901b0f5b9d3e?auto=format&fit=crop&w=500&q=60", tags: "Clean Eating | Low Fat", calories: 410, protein_val: 35, fat_val: 8, carbs_val: 50, price: "Rp 20.000", desc: "Ikan tanpa gorengan, disajikan dengan kecap manis pedas.", benefit: "Protein murni dan Omega-3.", bahan: "1 potong ikan tongkol/kakap, kecap manis, cabai rawit, timun, nasi.", cara: "1. Panggang ikan di teflon/air fryer. 2. Campur kecap manis dan irisan cabai rawit. 3. Sajikan ikan panggang dengan nasi dan irisan timun, siram dengan saus kecap.", keywords: ["ikan", "panggang", "kecap", "clean eating", "low fat", "nasi"] },
-            { id: 59, title: "Cah Brokoli Wortel Jamur", hewan: "", nabati: "jamur", sayur: "brokoli", karbo: "kentang", image: "https://images.unsplash.com/photo-1588147690186-07f7b163e9f3?auto=format&fit=crop&w=500&q=60", tags: "Vegan | Side Dish", calories: 250, protein_val: 10, fat_val: 5, carbs_val: 40, price: "Rp 10.000", desc: "Tumisan sayur komplit yang kaya vitamin.", benefit: "Tinggi serat, Vitamin C, dan antioksidan.", bahan: "Brokoli, wortel, jamur, bawang putih, kentang kukus.", cara: "1. Tumis bawang putih hingga harum. 2. Masukkan wortel dan jamur. 3. Masukkan brokoli, masak sebentar (jangan terlalu matang). Bumbui. 4. Sajikan dengan kentang kukus.", keywords: ["brokoli", "wortel", "jamur", "tumis", "vegan", "kentang"] },
-            { id: 60, title: "Sup Krim Jagung Manis", hewan: "ayam", nabati: "", sayur: "jagung", karbo: "roti", image: "https://images.unsplash.com/photo-1547592166-23acbe3a624b?auto=format&fit=crop&w=500&q=60", tags: "Comfort Food | Western", calories: 370, protein_val: 20, fat_val: 15, carbs_val: 40, price: "Rp 15.000", desc: "Sup jagung yang creamy dan mengenyangkan.", benefit: "Kalium dan Vitamin A. Cocok saat cuaca dingin.", bahan: "Dada ayam suwir, jagung manis, susu UHT, tepung maizena, roti tawar.", cara: "1. Rebus jagung dan ayam suwir. 2. Masukkan susu. Kentalkan dengan larutan maizena. 3. Bumbui. Sajikan hangat dengan roti tawar panggang.", keywords: ["sup", "krim", "jagung", "ayam", "roti", "creamy", "hangat"] }
-        ];
-
-        function cariResep() {
-            const container = document.getElementById('recipeContainer');
-            container.innerHTML = ''; 
-            
-            // Filter 1: Berdasarkan Kategori Bahan (Dropdown)
-            const selectedHewani = document.getElementById('inputHewani').value;
-            const selectedNabati = document.getElementById('inputNabati').value;
-            const selectedSayur = document.getElementById('inputSayur').value;
-            const selectedKarbo = document.getElementById('inputKarbo').value;
-            
-            // Filter 2: Berdasarkan Keyword (Text Input)
-            const keywordInput = document.getElementById('inputKeyword').value.toLowerCase().trim();
-            
-            const filtered = recipes.filter(item => {
-                let matchCategory = true;
-                let matchKeyword = true; // Default match jika keyword kosong
-
-                // 1. Logic Pencocokan Kategori Bahan
-                if(selectedHewani && item.hewan !== selectedHewani) matchCategory = false;
-                if(selectedNabati && item.nabati !== selectedNabati) matchCategory = false;
-                if(selectedSayur && item.sayur !== selectedSayur) matchCategory = false;
-                if(selectedKarbo && item.karbo !== selectedKarbo) matchCategory = false;
-                
-                // 2. Logic Pencocokan Keyword
-                if (keywordInput.length > 0) {
-                    // Cek apakah keyword ada di Title, Description, atau Keywords array
-                    const keywordFoundInTitle = item.title.toLowerCase().includes(keywordInput);
-                    const keywordFoundInDesc = item.desc.toLowerCase().includes(keywordInput);
-                    
-                    // Cek di array keywords (harus dijoin dulu)
-                    const keywordFoundInTags = item.keywords.join(" ").toLowerCase().includes(keywordInput); 
-                    
-                    if (!keywordFoundInTitle && !keywordFoundInDesc && !keywordFoundInTags) {
-                        matchKeyword = false;
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        sage: {
+                            50: '#f4f7f4',
+                            100: '#e3ebe3',
+                            200: '#c5d6c5',
+                            500: '#8A9A5B',
+                            600: '#5F6F45',
+                            700: '#4a5736',
+                            800: '#3A4A3A',
+                        },
+                        orange: {
+                            accent: '#E2725B',
+                        }
                     }
                 }
-                
-                // Resep lolos jika cocok di kategori DAN (jika ada input) cocok di keyword
-                return matchCategory && matchKeyword;
+            }
+        }
+    </script>
+
+    <!-- Import Maps untuk Library React & Icon -->
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.263.1",
+    "@google/genai": "https://esm.sh/@google/genai@0.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+  }
+}
+</script>
+</head>
+<body class="bg-stone-50 text-slate-800 antialiased">
+    <div id="root"></div>
+
+    <!-- MAIN APP SCRIPT -->
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect, useMemo } from 'react';
+        import ReactDOM from 'react-dom/client';
+        import { 
+            Leaf, User, ChefHat, Flame, Activity, Wheat, Sparkles, 
+            X, Heart, Info, CheckCircle2, SlidersHorizontal, RotateCcw, 
+            Search, ArrowDownCircle 
+        } from 'lucide-react';
+        import { GoogleGenAI } from '@google/genai';
+
+        // --- 1. DATA CONSTANTS (100+ Resep) ---
+        
+        const INGREDIENT_OPTIONS = {
+          hewan: [
+            { value: "telur", label: "Telur" },
+            { value: "ayam", label: "Dada Ayam" },
+            { value: "sarden", label: "Ikan Sarden" },
+            { value: "ikan", label: "Ikan Tongkol" },
+            { value: "sapi", label: "Daging Sapi/Kornet" },
+            { value: "udang", label: "Udang" },
+            { value: "sosis", label: "Sosis/Bakso" }
+          ],
+          nabati: [
+            { value: "tempe", label: "Tempe" },
+            { value: "tahu", label: "Tahu" },
+            { value: "kacang", label: "Kacang Hijau/Merah" },
+            { value: "jamur", label: "Jamur Tiram/Kancing" }
+          ],
+          sayur: [
+            { value: "bayam", label: "Bayam" },
+            { value: "wortel", label: "Wortel" },
+            { value: "brokoli", label: "Brokoli" },
+            { value: "kol", label: "Kol/Kubis" },
+            { value: "tomat", label: "Tomat" },
+            { value: "kangkung", label: "Kangkung" },
+            { value: "buncis", label: "Buncis" },
+            { value: "sawi", label: "Sawi Hijau" },
+            { value: "terong", label: "Terong" }
+          ],
+          karbo: [
+            { value: "nasi", label: "Nasi Putih" },
+            { value: "kentang", label: "Kentang" },
+            { value: "oat", label: "Oatmeal" },
+            { value: "mie", label: "Mie Instan" },
+            { value: "pasta", label: "Pasta/Spaghetti" },
+            { value: "roti", label: "Roti Tawar" },
+            { value: "bihun", label: "Bihun/Soun" }
+          ]
+        };
+
+        const INITIAL_RECIPES = [
+          // ==================== ANEKA TELUR ====================
+          { 
+            id: 1, title: "Tumis Telur Bayam Garlic", hewan: "telur", nabati: "", sayur: "bayam", karbo: "nasi", 
+            image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Diet Hemat", "Low Carb"], calories: 350, protein_val: 18, fat_val: 15, carbs_val: 35, price: "Rp 12.000", 
+            desc: "Menu akhir bulan kaya zat besi. Cepat, murah, dan sehat.", 
+            benefit: "Tinggi zat besi & Vitamin K.", ingredients: ["2 butir telur", "1 ikat bayam", "3 bawang putih", "Saus tiram"], 
+            cara: ["Tumis bawang.", "Masukkan bayam layu.", "Masukkan telur orak-arik."] 
+          },
+          {
+            id: 15, title: "Orak Arik Telur Kol", hewan: "telur", nabati: "", sayur: "kol", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1612927230555-d41c19b88496?auto=format&fit=crop&w=800&q=80",
+            tags: ["Super Hemat", "5 Menit"], calories: 200, protein_val: 12, fat_val: 10, carbs_val: 15, price: "Rp 5.000",
+            desc: "Penyelamat tanggal tua.", benefit: "Cukup gizi murah.", ingredients: ["2 telur", "Kol iris", "Bawang putih"],
+            cara: ["Tumis bawang.", "Masak telur.", "Masukkan kol."]
+          },
+          {
+            id: 101, title: "Telur Dadar Padang Ekonomis", hewan: "telur", nabati: "", sayur: "kol", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1626507498427-023a1f496150?auto=format&fit=crop&w=800&q=80",
+            tags: ["Indonesia", "Gurih"], calories: 300, protein_val: 14, fat_val: 20, carbs_val: 5, price: "Rp 8.000",
+            desc: "Telur dadar tebal ala warung Padang.", benefit: "Protein padat.", ingredients: ["2 telur", "Tepung beras", "Daun bawang", "Kol", "Cabai giling"],
+            cara: ["Kocok semua bahan.", "Goreng minyak banyak."]
+          },
+          {
+            id: 102, title: "Sandwich Telur Tomat", hewan: "telur", nabati: "", sayur: "tomat", karbo: "roti",
+            image: "https://images.unsplash.com/photo-1525351440155-ad29113d5839?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sarapan", "Kilat"], calories: 350, protein_val: 18, fat_val: 15, carbs_val: 30, price: "Rp 7.000",
+            desc: "Sarapan klasik praktis.", benefit: "Lycopene tomat.", ingredients: ["2 roti", "1 telur", "Tomat", "Saus"],
+            cara: ["Panggang roti.", "Goreng telur.", "Susun."]
+          },
+          {
+            id: 103, title: "Fuyunghai Mie Instan", hewan: "telur", nabati: "", sayur: "wortel", karbo: "mie",
+            image: "https://images.unsplash.com/photo-1610446736444-6330ce148d42?auto=format&fit=crop&w=800&q=80",
+            tags: ["Kenyang", "Anak Kost"], calories: 550, protein_val: 20, fat_val: 25, carbs_val: 60, price: "Rp 10.000",
+            desc: "Kreasi mie jadi omelet tebal siram saus.", benefit: "Karbo loading.", ingredients: ["1 mie rebus", "2 telur", "Wortel", "Saus tomat"],
+            cara: ["Campur mie & telur, goreng.", "Buat saus tomat kental."]
+          },
+          {
+            id: 201, title: "Telur Ceplok Kecap Pontianak", hewan: "telur", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80",
+            tags: ["Viral", "Simpel"], calories: 250, protein_val: 12, fat_val: 15, carbs_val: 10, price: "Rp 6.000",
+            desc: "Telur ceplok dengan kuah kecap bawang putih yang wangi.", benefit: "Protein cepat.",
+            ingredients: ["2 Telur", "3 Bawang putih cincang", "Kecap asin & manis", "Daun bawang"],
+            cara: ["Goreng telur setengah matang.", "Tumis bawang putih dengan minyak sisa telur.", "Masukkan kecap dan air dikit, siram ke telur."]
+          },
+          {
+            id: 202, title: "Telur Balado Merah", hewan: "telur", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80",
+            tags: ["Pedas", "Tradisional"], calories: 200, protein_val: 12, fat_val: 12, carbs_val: 8, price: "Rp 8.000",
+            desc: "Telur rebus goreng dengan sambal balado.", benefit: "Kenyang protein.",
+            ingredients: ["2 Telur rebus", "Cabai merah", "Bawang merah & putih", "Tomat"],
+            cara: ["Goreng telur rebus sebentar.", "Tumis bumbu halus balado.", "Campurkan."]
+          },
+          {
+            id: 203, title: "Sup Telur Jagung", hewan: "telur", nabati: "", sayur: "", karbo: "",
+            image: "https://images.unsplash.com/photo-1588147690186-07f7b163e9f3?auto=format&fit=crop&w=800&q=80",
+            tags: ["Hangat", "Comfort"], calories: 180, protein_val: 10, fat_val: 8, carbs_val: 15, price: "Rp 7.000",
+            desc: "Sup kental manis gurih ala restoran.", benefit: "Ringan dicerna.",
+            ingredients: ["1 Telur kocok", "1 Jagung manis pipil", "Maizena", "Kaldu ayam"],
+            cara: ["Rebus jagung.", "Tuang telur sambil diaduk memutar (serabut).", "Kentalkan dengan maizena."]
+          },
+          {
+            id: 204, title: "Telur Barendo (Crispy)", hewan: "telur", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80",
+            tags: ["Crispy", "Padang"], calories: 350, protein_val: 12, fat_val: 25, carbs_val: 5, price: "Rp 6.000",
+            desc: "Telur dadar super renyah keriting.", benefit: "Enak.",
+            ingredients: ["2 Telur", "Minyak banyak", "Garam"],
+            cara: ["Kocok telur sampai berbusa.", "Tuang agak tinggi ke minyak sangat panas.", "Goreng sampai kering."]
+          },
+          {
+            id: 205, title: "Telur Pindang Coklat (Tea Egg)", hewan: "telur", nabati: "", sayur: "", karbo: "",
+            image: "https://images.unsplash.com/photo-1506806969562-ab163c22da6e?auto=format&fit=crop&w=800&q=80",
+            tags: ["Awet", "Meal Prep"], calories: 80, protein_val: 7, fat_val: 5, carbs_val: 1, price: "Rp 5.000",
+            desc: "Telur rebus bumbu kecap & teh, awet disimpan.", benefit: "Rendah lemak.",
+            ingredients: ["Telur rebus", "Teh celup", "Kecap manis", "Bawang merah putih", "Salam lengkuas"],
+            cara: ["Rebus telur matang kupas/retakkan kulit.", "Rebus lagi dengan bumbu dan teh sampai coklat meresap."]
+          },
+          {
+            id: 206, title: "Tumis Sawi Putih Telur", hewan: "telur", nabati: "", sayur: "sawi", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1629196914375-f7e48f477b6d?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sayur", "Harian"], calories: 150, protein_val: 8, fat_val: 10, carbs_val: 10, price: "Rp 8.000",
+            desc: "Tumis sayur sederhana dan cepat.", benefit: "Serat tinggi.",
+            ingredients: ["Sawi putih", "1 Telur", "Bawang putih", "Cabai"],
+            cara: ["Orak arik telur.", "Tumis bawang.", "Masukkan sawi, beri air sedikit."]
+          },
+          {
+            id: 207, title: "Omelet Tahu (Tahu Telur)", hewan: "telur", nabati: "tahu", sayur: "toge", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1604561845607-427d2c3df313?auto=format&fit=crop&w=800&q=80",
+            tags: ["Jawa Timur", "Kenyang"], calories: 400, protein_val: 20, fat_val: 22, carbs_val: 25, price: "Rp 12.000",
+            desc: "Tahu telur goreng disiram bumbu kacang/kecap.", benefit: "Protein ganda.",
+            ingredients: ["2 Tahu potong dadu", "2 Telur", "Toge seduh", "Kecap manis/bumbu pecel"],
+            cara: ["Kocok telur dan tahu.", "Goreng dadar.", "Sajikan dengan toge dan bumbu."]
+          },
+          {
+            id: 209, title: "Semur Telur Tahu", hewan: "telur", nabati: "tahu", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1547470659-c2998a69a239?auto=format&fit=crop&w=800&q=80",
+            tags: ["Manis", "Kids Friendly"], calories: 300, protein_val: 18, fat_val: 12, carbs_val: 20, price: "Rp 10.000",
+            desc: "Telur dan tahu masak kecap manis.", benefit: "Protein lengkap.",
+            ingredients: ["Telur rebus", "Tahu goreng", "Kecap manis", "Pala, cengkeh"],
+            cara: ["Tumis bumbu halus.", "Masukkan air, kecap, telur, tahu.", "Masak sampai meresap."]
+          },
+
+          // ==================== ANEKA AYAM ====================
+          { 
+            id: 5, title: "Sup Ayam Jahe", hewan: "ayam", nabati: "", sayur: "wortel", karbo: "kentang", 
+            image: "https://images.unsplash.com/photo-1547592166-23acbe3a624b?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Immunity", "Flu Fighter"], calories: 350, protein_val: 30, fat_val: 10, carbs_val: 35, price: "Rp 20.000", 
+            desc: "Kuah hangat bening melegakan.", benefit: "Meningkatkan imun.", 
+            ingredients: ["Ayam dadu", "Wortel", "Kentang", "Jahe", "Bawang putih"], 
+            cara: ["Rebus ayam & jahe.", "Masukkan sayuran.", "Bumbui."] 
+          },
+          { 
+            id: 6, title: "Ayam Goreng Oat", hewan: "ayam", nabati: "", sayur: "tomat", karbo: "oat", 
+            image: "https://images.unsplash.com/photo-1627308594248-18e0018d9f1e?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Crispy", "Healthy Fry"], calories: 430, protein_val: 35, fat_val: 12, carbs_val: 50, price: "Rp 22.000", 
+            desc: "Ayam krispi sehat serat oat.", benefit: "Serat tinggi.", ingredients: ["Dada ayam", "Oatmeal", "Telur", "Bawang bubuk"], 
+            cara: ["Balur ayam ke telur lalu oat.", "Goreng/Air Fryer."] 
+          },
+          {
+            id: 17, title: "Soto Ayam Bening", hewan: "ayam", nabati: "", sayur: "kol", karbo: "bihun",
+            image: "https://images.unsplash.com/photo-1572656631137-7935297eff55?auto=format&fit=crop&w=800&q=80",
+            tags: ["Segar", "Traditional"], calories: 380, protein_val: 28, fat_val: 12, carbs_val: 40, price: "Rp 25.000",
+            desc: "Soto segar kuah kuning.", benefit: "Anti-inflamasi kunyit.", ingredients: ["Ayam rebus", "Bihun", "Kol", "Bumbu soto"],
+            cara: ["Tumis bumbu, buat kuah.", "Sajikan dengan pelengkap."]
+          },
+          {
+            id: 104, title: "Ayam Brokoli Saus Tiram", hewan: "ayam", nabati: "", sayur: "brokoli", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1603569283847-aa295f0d016a?auto=format&fit=crop&w=800&q=80",
+            tags: ["Chinese Food", "Sehat"], calories: 400, protein_val: 35, fat_val: 15, carbs_val: 40, price: "Rp 25.000",
+            desc: "Menu restoran Chinese versi rumahan.", benefit: "Tinggi protein serat.", ingredients: ["Ayam iris", "Brokoli", "Saus tiram", "Bawang putih"],
+            cara: ["Tumis ayam.", "Masukkan brokoli & saus."]
+          },
+          {
+            id: 105, title: "Nasi Tim Ayam Jamur", hewan: "ayam", nabati: "jamur", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1616656722880-928929734994?auto=format&fit=crop&w=800&q=80",
+            tags: ["Comfort Food", "Lembut"], calories: 450, protein_val: 25, fat_val: 10, carbs_val: 60, price: "Rp 20.000",
+            desc: "Nasi lembut topping ayam jamur.", benefit: "Mudah dicerna.", ingredients: ["Beras", "Ayam cincang", "Jamur", "Kecap manis"],
+            cara: ["Masak topping ayam.", "Masak nasi di rice cooker dengan topping di atasnya."]
+          },
+          {
+            id: 210, title: "Ayam Kecap Mentega", hewan: "ayam", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1627308594248-18e0018d9f1e?auto=format&fit=crop&w=800&q=80",
+            tags: ["Favorit", "Gurih"], calories: 400, protein_val: 30, fat_val: 20, carbs_val: 20, price: "Rp 20.000",
+            desc: "Ayam goreng dengan saus mentega kecap.", benefit: "Kaya rasa.",
+            ingredients: ["Ayam potong", "Mentega/Margarin", "Kecap manis & Inggris", "Bawang bombay"],
+            cara: ["Goreng ayam.", "Tumis bombay dengan mentega.", "Masukkan ayam dan kecap."]
+          },
+          {
+            id: 211, title: "Ayam Suwir Pedas (Balado)", hewan: "ayam", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1541249969116-37207624921f?auto=format&fit=crop&w=800&q=80",
+            tags: ["Pedas", "Meal Prep"], calories: 300, protein_val: 32, fat_val: 10, carbs_val: 5, price: "Rp 20.000",
+            desc: "Dada ayam suwir bumbu pedas, awet dikulkas.", benefit: "Protein tinggi rendah lemak.",
+            ingredients: ["Dada ayam rebus suwir", "Cabai merah", "Daun jeruk", "Serai"],
+            cara: ["Tumis bumbu halus.", "Masukkan ayam suwir & daun jeruk.", "Masak sampai kering."]
+          },
+          {
+            id: 212, title: "Ayam Goreng Lengkuas", hewan: "ayam", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80",
+            tags: ["Tradisional", "Wangi"], calories: 450, protein_val: 30, fat_val: 25, carbs_val: 10, price: "Rp 22.000",
+            desc: "Ayam goreng dengan remah lengkuas gurih.", benefit: "Aroma menggugah.",
+            ingredients: ["Ayam ungkep", "Lengkuas parut banyak", "Kunyit, ketumbar"],
+            cara: ["Ungkep ayam dengan bumbu & lengkuas parut.", "Goreng ayam dan bumbunya sampai kering."]
+          },
+          {
+            id: 213, title: "Ayam Popcorn (Camilan/Lauk)", hewan: "ayam", nabati: "", sayur: "", karbo: "kentang",
+            image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=800&q=80",
+            tags: ["Snack", "Crispy"], calories: 350, protein_val: 20, fat_val: 18, carbs_val: 25, price: "Rp 18.000",
+            desc: "Potongan ayam kecil tepung crispy.", benefit: "Disukai anak-anak.",
+            ingredients: ["Dada ayam dadu kecil", "Tepung bumbu", "Minyak"],
+            cara: ["Celup ayam ke tepung.", "Goreng deep fry."]
+          },
+          {
+            id: 218, title: "Ayam Teriyaki Simple", hewan: "ayam", nabati: "", sayur: "wortel", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1547496502-ffa76f30d088?auto=format&fit=crop&w=800&q=80",
+            tags: ["Jepang", "Manis"], calories: 400, protein_val: 30, fat_val: 15, carbs_val: 30, price: "Rp 22.000",
+            desc: "Ayam saus manis ala Jepang.", benefit: "Disukai semua.",
+            ingredients: ["Ayam fillet", "Saus Teriyaki/Tiram+Kecap", "Bawang bombay", "Wortel"],
+            cara: ["Marinasi ayam.", "Tumis ayam dan bombay.", "Masukkan sisa saus."]
+          },
+          {
+            id: 219, title: "Pepes Ayam Kemangi", hewan: "ayam", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1541249969116-37207624921f?auto=format&fit=crop&w=800&q=80",
+            tags: ["Kukus", "Sehat"], calories: 350, protein_val: 35, fat_val: 10, carbs_val: 5, price: "Rp 20.000",
+            desc: "Ayam kukus bumbu rempah.", benefit: "Tanpa minyak.",
+            ingredients: ["Ayam", "Kemangi", "Bumbu halus kuning", "Daun pisang (opsional)"],
+            cara: ["Campur ayam bumbu.", "Bungkus/taruh wadah.", "Kukus matang."]
+          },
+
+          // ==================== ANEKA IKAN & SEAFOOD ====================
+          { 
+            id: 2, title: "Nasi Gila Sarden", hewan: "sarden", nabati: "", sayur: "kol", karbo: "nasi", 
+            image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Anak Kost", "One Pot"], calories: 480, protein_val: 22, fat_val: 20, carbs_val: 50, price: "Rp 15.000", 
+            desc: "Sarden masak nasi.", benefit: "Omega-3.", ingredients: ["Sarden", "Kol", "Bawang", "Nasi"], 
+            cara: ["Tumis bumbu & sarden.", "Campur nasi."] 
+          },
+          { 
+            id: 7, title: "Mie Nyemek Tongkol", hewan: "ikan", nabati: "", sayur: "sawi", karbo: "mie", 
+            image: "https://images.unsplash.com/photo-1541249969116-37207624921f?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Pedas", "Hack"], calories: 520, protein_val: 28, fat_val: 22, carbs_val: 55, price: "Rp 18.000", 
+            desc: "Mie kuah kental ikan.", benefit: "Protein otot.", ingredients: ["Mie instan", "Tongkol suwir", "Sawi", "Telur"], 
+            cara: ["Masak mie.", "Campur tongkol & telur."] 
+          },
+          { 
+            id: 10, title: "Roti Bakar Tuna Melt", hewan: "ikan", nabati: "", sayur: "tomat", karbo: "roti", 
+            image: "https://images.unsplash.com/photo-1619623067140-5e5d3269a840?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Western", "Portable"], calories: 340, protein_val: 25, fat_val: 18, carbs_val: 20, price: "Rp 16.000", 
+            desc: "Sandwich tuna creamy.", benefit: "Protein.", ingredients: ["Roti", "Tuna kaleng", "Mayo", "Tomat"], 
+            cara: ["Campur tuna mayo.", "Isi roti.", "Panggang."] 
+          },
+          {
+            id: 106, title: "Sarden Tumis Kangkung", hewan: "sarden", nabati: "", sayur: "kangkung", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80",
+            tags: ["Zat Besi", "Cepat"], calories: 300, protein_val: 18, fat_val: 12, carbs_val: 35, price: "Rp 15.000",
+            desc: "Sarden campur kangkung.", benefit: "Zat besi.", ingredients: ["Sarden", "Kangkung", "Bawang"],
+            cara: ["Tumis bumbu.", "Masak sarden.", "Layukan kangkung."]
+          },
+          {
+            id: 220, title: "Sarden Goreng Tepung (Crispy)", hewan: "sarden", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+            tags: ["Unik", "Crispy"], calories: 350, protein_val: 20, fat_val: 20, carbs_val: 25, price: "Rp 15.000",
+            desc: "Ikan sarden kaleng digoreng garing.", benefit: "Kalsium (tulang sarden).",
+            ingredients: ["Ikan sarden (tiriskan kuah)", "Tepung bumbu"],
+            cara: ["Gulingkan ikan ke tepung.", "Goreng garing.", "Sajikan kuahnya sebagai saus cocolan."]
+          },
+          {
+            id: 221, title: "Ikan Goreng Sambal Matah", hewan: "ikan", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1541249969116-37207624921f?auto=format&fit=crop&w=800&q=80",
+            tags: ["Bali", "Segar"], calories: 380, protein_val: 25, fat_val: 22, carbs_val: 10, price: "Rp 18.000",
+            desc: "Ikan goreng disiram sambal mentah segar.", benefit: "Sehat tanpa santan.",
+            ingredients: ["Ikan tongkol/kembung goreng", "Bawang merah iris", "Serai iris", "Cabai rawit", "Minyak panas"],
+            cara: ["Campur irisan bumbu.", "Siram minyak panas & jeruk nipis.", "Taruh di atas ikan."]
+          },
+          {
+            id: 223, title: "Ikan Pesmol Kuning", hewan: "ikan", nabati: "", sayur: "wortel", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1572656631137-7935297eff55?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sunda", "Asam Segar"], calories: 400, protein_val: 25, fat_val: 18, carbs_val: 15, price: "Rp 20.000",
+            desc: "Ikan bumbu kuning acar.", benefit: "Kunyit & cuka.",
+            ingredients: ["Ikan goreng", "Bumbu kuning", "Wortel potong korek", "Cuka/Jeruk"],
+            cara: ["Tumis bumbu kuning & wortel.", "Beri air & cuka.", "Masukkan ikan."]
+          },
+          {
+            id: 224, title: "Tumis Udang Buncis", hewan: "udang", nabati: "", sayur: "buncis", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1603082260683-149b56f8a379?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sehat", "Cepat"], calories: 250, protein_val: 18, fat_val: 10, carbs_val: 10, price: "Rp 22.000",
+            desc: "Sayur buncis manis dengan udang.", benefit: "Serat & Protein.",
+            ingredients: ["Udang kupas", "Buncis iris serong", "Bawang putih", "Saus tiram"],
+            cara: ["Tumis udang berubah warna.", "Masukkan buncis.", "Bumbui."]
+          },
+
+          // ==================== ANEKA SAPI & SOSIS ====================
+          {
+            id: 16, title: "Perkedel Kentang Kornet", hewan: "sapi", nabati: "", sayur: "", karbo: "kentang",
+            image: "https://images.unsplash.com/photo-1655610852024-e274a1cb5d37?auto=format&fit=crop&w=800&q=80",
+            tags: ["Side Dish", "Kids"], calories: 300, protein_val: 10, fat_val: 18, carbs_val: 35, price: "Rp 15.000",
+            desc: "Lauk pendamping soto.", benefit: "Energi.", ingredients: ["Kentang", "Kornet", "Telur"],
+            cara: ["Haluskan kentang goreng.", "Campur kornet.", "Celup telur, goreng."]
+          },
+          {
+            id: 108, title: "Tumis Buncis Sapi Cincang", hewan: "sapi", nabati: "", sayur: "buncis", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1603082260683-149b56f8a379?auto=format&fit=crop&w=800&q=80",
+            tags: ["Chinese", "Crunchy"], calories: 350, protein_val: 15, fat_val: 20, carbs_val: 30, price: "Rp 20.000",
+            desc: "Buncis ala Szechuan.", benefit: "Serat.", ingredients: ["Buncis", "Sapi/Kornet", "Bawang"],
+            cara: ["Goreng buncis sebentar.", "Tumis daging.", "Campur."]
+          },
+          {
+            id: 109, title: "Nasi Goreng Sosis", hewan: "sosis", nabati: "", sayur: "sawi", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1603133872878-684f108fd1f6?auto=format&fit=crop&w=800&q=80",
+            tags: ["Dinner", "Classic"], calories: 500, protein_val: 15, fat_val: 20, carbs_val: 65, price: "Rp 12.000",
+            desc: "Nasi goreng kampung.", benefit: "Kenyang.", ingredients: ["Nasi", "Sosis", "Sawi", "Kecap"],
+            cara: ["Tumis bumbu & sosis.", "Masak nasi goreng."]
+          },
+          {
+            id: 230, title: "Tumis Sosis Asam Manis", hewan: "sosis", nabati: "", sayur: "tomat", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1610446736444-6330ce148d42?auto=format&fit=crop&w=800&q=80",
+            tags: ["Anak", "Cepat"], calories: 350, protein_val: 12, fat_val: 20, carbs_val: 20, price: "Rp 12.000",
+            desc: "Sosis mekar saus tomat.", benefit: "Praktis.",
+            ingredients: ["Sosis (kerat)", "Bawang bombay", "Saus tomat & sambal"],
+            cara: ["Tumis sosis mekar.", "Masukkan saus & bombay.", "Beri air dikit."]
+          },
+          {
+            id: 233, title: "Sapi Lada Hitam (Versi Kornet)", hewan: "sapi", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1541249969116-37207624921f?auto=format&fit=crop&w=800&q=80",
+            tags: ["Hack", "Mewah"], calories: 350, protein_val: 15, fat_val: 25, carbs_val: 10, price: "Rp 18.000",
+            desc: "Kornet dimasak ala blackpepper.", benefit: "Rasa mewah harga murah.",
+            ingredients: ["Kornet sapi", "Bawang bombay", "Saus lada hitam", "Paprika/Cabai besar"],
+            cara: ["Bentuk kornet bulat, goreng.", "Tumis bombay & saus.", "Campur kornet."]
+          },
+          {
+            id: 236, title: "Tumis Sosis Sayuran (Capcay Sosis)", hewan: "sosis", nabati: "", sayur: "wortel", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1603082260683-149b56f8a379?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sehat", "Warna-warni"], calories: 300, protein_val: 10, fat_val: 15, carbs_val: 25, price: "Rp 15.000",
+            desc: "Sayur campur sosis.", benefit: "Serat.",
+            ingredients: ["Sosis", "Wortel, Buncis, Kol", "Bawang putih"],
+            cara: ["Tumis bawang.", "Masak sayur.", "Masukkan sosis."]
+          },
+          {
+            id: 240, title: "Corned Beef Hash (Tumis Kentang Kornet)", hewan: "sapi", nabati: "", sayur: "", karbo: "kentang",
+            image: "https://images.unsplash.com/photo-1655610852024-e274a1cb5d37?auto=format&fit=crop&w=800&q=80",
+            tags: ["Western", "Breakfast"], calories: 400, protein_val: 15, fat_val: 20, carbs_val: 35, price: "Rp 18.000",
+            desc: "Tumisan kentang dadu dan kornet kering.", benefit: "Energi sarapan.",
+            ingredients: ["Kentang rebus dadu", "Kornet", "Bawang bombay"],
+            cara: ["Tumis bombay & kornet sampai kering.", "Masukkan kentang.", "Aduk rata sampai agak gosong dikit."]
+          },
+
+          // ==================== ANEKA TAHU TEMPE & NABATI ====================
+          { 
+            id: 3, title: "Steak Tempe Blackpepper", hewan: "", nabati: "tempe", sayur: "wortel", karbo: "kentang", 
+            image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+            tags: ["Vegan", "Protein"], calories: 420, protein_val: 25, fat_val: 18, carbs_val: 40, price: "Rp 10.000", 
+            desc: "Steak ala resto dari tempe.", benefit: "Rendah kolesterol.", ingredients: ["Tempe", "Kentang", "Wortel", "Saus lada hitam"], 
+            cara: ["Panggang patty tempe.", "Siram saus."] 
+          },
+          { 
+            id: 4, title: "Tahu Cabai Garam", hewan: "", nabati: "tahu", sayur: "", karbo: "nasi", 
+            image: "https://images.unsplash.com/photo-1546548970-71785318a17b?auto=format&fit=crop&w=800&q=80",
+            tags: ["Pedas", "Viral"], calories: 380, protein_val: 15, fat_val: 20, carbs_val: 45, price: "Rp 11.000", 
+            desc: "Tahu crispy bawang cabai.", benefit: "Kalsium.", ingredients: ["Tahu", "Cabai", "Bawang putih", "Tepung"], 
+            cara: ["Goreng tahu tepung.", "Tumis cabai bawang.", "Aduk."] 
+          },
+          { 
+            id: 8, title: "Spaghetti Aglio Olio Tempe", hewan: "", nabati: "tempe", sayur: "brokoli", karbo: "pasta", 
+            image: "https://images.unsplash.com/photo-1593361413861-1ac606992d42?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Fusion", "Vegetarian"], calories: 400, protein_val: 20, fat_val: 15, carbs_val: 50, price: "Rp 15.000", 
+            desc: "Pasta mewah kearifan lokal.", benefit: "Isoflavon.", ingredients: ["Pasta", "Tempe", "Brokoli", "Bawang putih"], 
+            cara: ["Rebus pasta.", "Tumis tempe & bumbu.", "Campur."] 
+          },
+          { 
+            id: 11, title: "Bubur Kacang Hijau", hewan: "", nabati: "kacang", sayur: "", karbo: "", 
+            image: "https://images.unsplash.com/photo-1587397750137-b6f8498877f8?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Dessert", "Fiber"], calories: 280, protein_val: 12, fat_val: 8, carbs_val: 45, price: "Rp 7.000", 
+            desc: "Manis alami.", benefit: "Pencernaan.", ingredients: ["Kacang hijau", "Gula merah", "Santan"], 
+            cara: ["Rebus kacang empuk.", "Masak santan gula."] 
+          },
+          { 
+            id: 13, title: "Semur Tahu Kentang", hewan: "", nabati: "tahu", sayur: "", karbo: "kentang", 
+            image: "https://images.unsplash.com/photo-1547470659-c2998a69a239?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Manis", "Tradisional"], calories: 330, protein_val: 16, fat_val: 10, carbs_val: 45, price: "Rp 12.000", 
+            desc: "Kuah kecap rempah.", benefit: "Nabati.", ingredients: ["Tahu", "Kentang", "Kecap manis"], 
+            cara: ["Tumis bumbu.", "Rebus tahu kentang kecap."] 
+          },
+          {
+            id: 20, title: "Jamur Crispy Asam Manis", hewan: "", nabati: "jamur", sayur: "wortel", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1625937751876-4515cd8e78bd?auto=format&fit=crop&w=800&q=80",
+            tags: ["Vegan", "Chinese"], calories: 320, protein_val: 10, fat_val: 16, carbs_val: 45, price: "Rp 14.000",
+            desc: "Jamur goreng saus.", benefit: "Pengganti daging.", ingredients: ["Jamur tiram", "Tepung", "Saus tomat"],
+            cara: ["Goreng jamur.", "Siram saus."]
+          },
+          {
+            id: 111, title: "Orek Tempe Basah", hewan: "", nabati: "tempe", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1629196914375-f7e48f477b6d?auto=format&fit=crop&w=800&q=80",
+            tags: ["Warteg", "Awet"], calories: 300, protein_val: 18, fat_val: 12, carbs_val: 40, price: "Rp 6.000",
+            desc: "Lauk sejuta umat.", benefit: "Probiotik.", ingredients: ["Tempe", "Kecap", "Cabai"],
+            cara: ["Goreng tempe.", "Masak kecap air."]
+          },
+          {
+            id: 241, title: "Tempe Mendoan", hewan: "", nabati: "tempe", sayur: "", karbo: "",
+            image: "https://images.unsplash.com/photo-1629196914375-f7e48f477b6d?auto=format&fit=crop&w=800&q=80",
+            tags: ["Gorengan", "Snack"], calories: 250, protein_val: 10, fat_val: 15, carbs_val: 20, price: "Rp 5.000",
+            desc: "Tempe tepung setengah matang.", benefit: "Enak.",
+            ingredients: ["Tempe iris tipis", "Tepung terigu & beras", "Daun bawang", "Bumbu halus ketumbar"],
+            cara: ["Celup tempe ke adonan.", "Goreng sebentar (mendo)."]
+          },
+          {
+            id: 242, title: "Sambal Tempe Penyet", hewan: "", nabati: "tempe", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1629196914375-f7e48f477b6d?auto=format&fit=crop&w=800&q=80",
+            tags: ["Pedas", "Lauk"], calories: 300, protein_val: 15, fat_val: 12, carbs_val: 25, price: "Rp 6.000",
+            desc: "Tempe goreng dipenyet sambal terasi.", benefit: "Selera makan.",
+            ingredients: ["Tempe goreng", "Sambal terasi/bawang"],
+            cara: ["Ulek sambal.", "Penyet tempe di cobek."]
+          },
+          {
+            id: 243, title: "Tahu Gejrot", hewan: "", nabati: "tahu", sayur: "", karbo: "",
+            image: "https://images.unsplash.com/photo-1546548970-71785318a17b?auto=format&fit=crop&w=800&q=80",
+            tags: ["Cirebon", "Pedas"], calories: 200, protein_val: 10, fat_val: 8, carbs_val: 25, price: "Rp 8.000",
+            desc: "Tahu pong kuah asam pedas.", benefit: "Segar.",
+            ingredients: ["Tahu pong/sumedang", "Gula merah, asam, kecap", "Cabai rawit, bawang merah"],
+            cara: ["Ulek kasar bumbu.", "Siram kuah gula asam.", "Potong tahu."]
+          },
+          {
+            id: 245, title: "Tumis Jamur Tiram Pedas", hewan: "", nabati: "jamur", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1625937751876-4515cd8e78bd?auto=format&fit=crop&w=800&q=80",
+            tags: ["Pedas", "Kenyal"], calories: 150, protein_val: 5, fat_val: 8, carbs_val: 10, price: "Rp 10.000",
+            desc: "Jamur suwir tumis cabai.", benefit: "Serat.",
+            ingredients: ["Jamur tiram suwir", "Cabai", "Bawang"],
+            cara: ["Tumis bumbu.", "Masukkan jamur.", "Masak sampai layu."]
+          },
+          {
+            id: 249, title: "Sate Jamur Tiram", hewan: "", nabati: "jamur", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1625937751876-4515cd8e78bd?auto=format&fit=crop&w=800&q=80",
+            tags: ["Vegan", "Bakar"], calories: 200, protein_val: 8, fat_val: 5, carbs_val: 20, price: "Rp 12.000",
+            desc: "Sate dari jamur.", benefit: "Mirip ayam.",
+            ingredients: ["Jamur tiram (rebus sebentar peras airnya)", "Bumbu kecap kacang"],
+            cara: ["Tusuk jamur.", "Bakar oles kecap.", "Sajikan bumbu kacang."]
+          },
+
+          // ==================== ANEKA SAYUR MAYUR ====================
+          { 
+            id: 12, title: "Capcay Kuah Telur Puyuh", hewan: "telur", nabati: "jamur", sayur: "wortel", karbo: "", 
+            image: "https://images.unsplash.com/photo-1662973747190-6718d055416c?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Vitamin", "Family"], calories: 250, protein_val: 14, fat_val: 10, carbs_val: 18, price: "Rp 15.000", 
+            desc: "Sayur lengkap kuah kental.", benefit: "Multivitamin.", ingredients: ["Wortel", "Sawi", "Telur puyuh", "Jamur"], 
+            cara: ["Tumis bawang.", "Masak sayur.", "Kentalkan."] 
+          },
+          { 
+            id: 14, title: "Oseng Buncis Udang", hewan: "udang", nabati: "tempe", sayur: "buncis", karbo: "nasi", 
+            image: "https://images.unsplash.com/photo-1603082260683-149b56f8a379?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Seafood", "Fiber"], calories: 310, protein_val: 22, fat_val: 12, carbs_val: 30, price: "Rp 25.000", 
+            desc: "Buncis crunchy udang manis.", benefit: "Yodium.", ingredients: ["Udang", "Buncis", "Tempe"], 
+            cara: ["Tumis udang.", "Masukkan buncis."] 
+          },
+          {
+            id: 18, title: "Tumis Kangkung Terasi", hewan: "", nabati: "", sayur: "kangkung", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80",
+            tags: ["Classic", "Fiber"], calories: 150, protein_val: 5, fat_val: 8, carbs_val: 10, price: "Rp 5.000",
+            desc: "Menu wajib warteg.", benefit: "Zat besi.", ingredients: ["Kangkung", "Terasi"],
+            cara: ["Tumis terasi.", "Masak kangkung cepat."]
+          },
+          {
+            id: 114, title: "Sayur Bening Bayam", hewan: "", nabati: "", sayur: "bayam", karbo: "",
+            image: "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?auto=format&fit=crop&w=800&q=80",
+            tags: ["Segar", "Ringan"], calories: 100, protein_val: 4, fat_val: 1, carbs_val: 20, price: "Rp 6.000",
+            desc: "Sayur paling segar.", benefit: "Hidrasi.", ingredients: ["Bayam", "Jagung", "Kunci"],
+            cara: ["Rebus jagung.", "Masukkan bayam sebentar."]
+          },
+          {
+            id: 115, title: "Terong Balado Teri", hewan: "ikan", nabati: "", sayur: "terong", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1518596647976-574d6d678733?auto=format&fit=crop&w=800&q=80",
+            tags: ["Pedas", "Nafsu Makan"], calories: 300, protein_val: 10, fat_val: 20, carbs_val: 25, price: "Rp 12.000",
+            desc: "Pedas gurih asin.", benefit: "Kalsium teri.", ingredients: ["Terong", "Teri", "Sambal"],
+            cara: ["Goreng terong & teri.", "Tumis sambal."]
+          },
+          {
+            id: 250, title: "Sayur Asem Jakarta", hewan: "", nabati: "kacang", sayur: "labu", karbo: "",
+            image: "https://images.unsplash.com/photo-1576021182211-9ea8dced3690?auto=format&fit=crop&w=800&q=80",
+            tags: ["Segar", "Betawi"], calories: 150, protein_val: 8, fat_val: 2, carbs_val: 25, price: "Rp 10.000",
+            desc: "Kuah asam segar dengan kacang tanah.", benefit: "Vitamin.",
+            ingredients: ["Labu siam", "Kacang panjang", "Jagung", "Asam jawa", "Kacang tanah"],
+            cara: ["Rebus air bumbu halus.", "Masukkan sayuran keras.", "Terakhir daun melinjo (jika ada)."]
+          },
+          {
+            id: 252, title: "Pecel Sayur (Bumbu Jadi)", hewan: "telur", nabati: "tahu", sayur: "bayam", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sehat", "Tradisional"], calories: 400, protein_val: 15, fat_val: 15, carbs_val: 50, price: "Rp 10.000",
+            desc: "Salad Jawa dengan bumbu kacang.", benefit: "Serat tinggi.",
+            ingredients: ["Bayam rebus", "Tauge rebus", "Kacang panjang", "Bumbu pecel instan"],
+            cara: ["Rebus semua sayuran.", "Seduh bumbu pecel.", "Siram."]
+          },
+          {
+            id: 254, title: "Tumis Labu Siam Telur", hewan: "telur", nabati: "", sayur: "labu", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1629196914375-f7e48f477b6d?auto=format&fit=crop&w=800&q=80",
+            tags: ["Diet", "Simpel"], calories: 180, protein_val: 10, fat_val: 10, carbs_val: 15, price: "Rp 8.000",
+            desc: "Labu siam potong korek tumis.", benefit: "Rendah kalori.",
+            ingredients: ["Labu siam", "Telur", "Bawang putih"],
+            cara: ["Tumis bawang.", "Masukkan telur arik.", "Masukkan labu."]
+          },
+          {
+            id: 255, title: "Tumis Pare Teri (Tips Tidak Pahit)", hewan: "ikan", nabati: "", sayur: "pare", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80",
+            tags: ["Pahit", "Obat"], calories: 200, protein_val: 12, fat_val: 10, carbs_val: 15, price: "Rp 10.000",
+            desc: "Pare tumis teri.", benefit: "Menurunkan gula darah.",
+            ingredients: ["Pare (remas garam cuci bersih)", "Teri goreng", "Cabai"],
+            cara: ["Tumis bumbu.", "Masukkan pare.", "Terakhir teri."]
+          },
+          {
+            id: 257, title: "Tumis Kacang Panjang Tempe", hewan: "", nabati: "tempe", sayur: "kacang", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1603082260683-149b56f8a379?auto=format&fit=crop&w=800&q=80",
+            tags: ["Harian", "Murah"], calories: 250, protein_val: 12, fat_val: 10, carbs_val: 25, price: "Rp 7.000",
+            desc: "Sayur rumahan klasik.", benefit: "Serat.",
+            ingredients: ["Kacang panjang", "Tempe dadu", "Kecap manis"],
+            cara: ["Goreng tempe 1/2 matang.", "Tumis bumbu & kacang panjang.", "Campur tempe & kecap."]
+          },
+          {
+            id: 258, title: "Brokoli Cah Bawang Putih", hewan: "", nabati: "", sayur: "brokoli", karbo: "",
+            image: "https://images.unsplash.com/photo-1603569283847-aa295f0d016a?auto=format&fit=crop&w=800&q=80",
+            tags: ["Resto", "Sehat"], calories: 100, protein_val: 5, fat_val: 5, carbs_val: 10, price: "Rp 10.000",
+            desc: "Tumis brokoli simpel ala resto.", benefit: "Antioksidan.",
+            ingredients: ["Brokoli", "Bawang putih cincang banyak", "Minyak wijen"],
+            cara: ["Rebus brokoli sebentar.", "Tumis bawang sampai emas.", "Siram ke brokoli."]
+          },
+          {
+            id: 259, title: "Gado-Gado (Simple)", hewan: "telur", nabati: "tahu", sayur: "bayam", karbo: "kentang",
+            image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80",
+            tags: ["Salad", "Kenyang"], calories: 450, protein_val: 20, fat_val: 20, carbs_val: 50, price: "Rp 15.000",
+            desc: "Sayur rebus, tahu, tempe, telur bumbu kacang.", benefit: "Gizi lengkap.",
+            ingredients: ["Sayuran rebus", "Tahu tempe goreng", "Telur rebus", "Bumbu gado-gado blok"],
+            cara: ["Tata semua bahan.", "Siram bumbu kacang."]
+          },
+
+          // ==================== ANEKA KARBO & LAINNYA ====================
+          { 
+            id: 9, title: "Bubur Oatmeal Gurih", hewan: "telur", nabati: "", sayur: "bayam", karbo: "oat", 
+            image: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=800&q=80", 
+            tags: ["Breakfast", "Diet"], calories: 320, protein_val: 18, fat_val: 12, carbs_val: 40, price: "Rp 8.000", 
+            desc: "Bubur oat asin.", benefit: "Jantung.", ingredients: ["Oatmeal", "Telur", "Bayam", "Kaldu"], 
+            cara: ["Seduh oat.", "Topping telur."] 
+          },
+          {
+            id: 19, title: "Bihun Goreng Kampung", hewan: "telur", nabati: "", sayur: "sawi", karbo: "bihun",
+            image: "https://images.unsplash.com/photo-1626804475297-411dbe66f076?auto=format&fit=crop&w=800&q=80",
+            tags: ["Dinner", "Carbo"], calories: 410, protein_val: 14, fat_val: 15, carbs_val: 60, price: "Rp 12.000",
+            desc: "Bihun kecap.", benefit: "Energi.", ingredients: ["Bihun", "Telur", "Sawi", "Kecap"],
+            cara: ["Tumis bumbu telur.", "Masukkan bihun."]
+          },
+          {
+            id: 116, title: "Nasi Goreng Kencur", hewan: "telur", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1603133872878-684f108fd1f6?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sunda", "Wangi"], calories: 450, protein_val: 12, fat_val: 15, carbs_val: 60, price: "Rp 8.000",
+            desc: "Nasgor aroma kencur.", benefit: "Hangat.", ingredients: ["Nasi", "Kencur", "Telur"],
+            cara: ["Ulek kencur.", "Masak nasgor."]
+          },
+          {
+            id: 117, title: "Mie Tek-Tek Kuah", hewan: "telur", nabati: "", sayur: "kol", karbo: "mie",
+            image: "https://images.unsplash.com/photo-1612530188095-2c8135832711?auto=format&fit=crop&w=800&q=80",
+            tags: ["Hujan", "Pedas"], calories: 480, protein_val: 15, fat_val: 18, carbs_val: 55, price: "Rp 10.000",
+            desc: "Mie kuah abang-abang.", benefit: "Kenyang.", ingredients: ["Mie", "Telur", "Sayur"],
+            cara: ["Tumis bumbu.", "Rebus mie & telur."]
+          },
+          {
+            id: 260, title: "Nasi Kuning Rice Cooker", hewan: "", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sarapan", "Wangi"], calories: 300, protein_val: 5, fat_val: 10, carbs_val: 50, price: "Rp 5.000",
+            desc: "Nasi kuning praktis.", benefit: "Karbo enak.",
+            ingredients: ["Beras", "Santan instan", "Kunyit bubuk", "Serai daun salam"],
+            cara: ["Cuci beras.", "Masukkan semua bahan ke rice cooker.", "Masak seperti nasi biasa."]
+          },
+          {
+            id: 261, title: "Nasi Uduk Rice Cooker", hewan: "", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sarapan", "Gurih"], calories: 300, protein_val: 5, fat_val: 10, carbs_val: 50, price: "Rp 5.000",
+            desc: "Nasi uduk wangi santan.", benefit: "Energi.",
+            ingredients: ["Beras", "Santan", "Salam", "Garam"],
+            cara: ["Masak di rice cooker."]
+          },
+          {
+            id: 262, title: "Mie Goreng Jawa", hewan: "ayam", nabati: "", sayur: "kol", karbo: "mie",
+            image: "https://images.unsplash.com/photo-1612530188095-2c8135832711?auto=format&fit=crop&w=800&q=80",
+            tags: ["Manis", "Jawa"], calories: 450, protein_val: 18, fat_val: 15, carbs_val: 60, price: "Rp 15.000",
+            desc: "Mie goreng basah manis.", benefit: "Kenyang.",
+            ingredients: ["Mie telor basah/kuning", "Ayam suwir", "Kecap manis", "Kol, Sawi"],
+            cara: ["Tumis bumbu kemiri.", "Masukkan mie & kecap.", "Beri sedikit air biar nyemek."]
+          },
+          {
+            id: 264, title: "Kwetiau Goreng Telur", hewan: "telur", nabati: "", sayur: "sawi", karbo: "mie",
+            image: "https://images.unsplash.com/photo-1612530188095-2c8135832711?auto=format&fit=crop&w=800&q=80",
+            tags: ["Chinese", "Cepat"], calories: 420, protein_val: 12, fat_val: 18, carbs_val: 55, price: "Rp 10.000",
+            desc: "Kwetiau goreng simpel.", benefit: "Kenyang.",
+            ingredients: ["Kwetiau basah", "Telur", "Bawang putih", "Kecap asin manis"],
+            cara: ["Orak arik telur.", "Masukkan kwetiau & bumbu.", "Masak api besar."]
+          },
+          {
+            id: 265, title: "Roti Bakar Telur Keju", hewan: "telur", nabati: "", sayur: "", karbo: "roti",
+            image: "https://images.unsplash.com/photo-1525351440155-ad29113d5839?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sarapan", "Cheesy"], calories: 350, protein_val: 15, fat_val: 18, carbs_val: 30, price: "Rp 10.000",
+            desc: "Toast gurih.", benefit: "Kalsium.",
+            ingredients: ["Roti tawar", "Telur dadar", "Keju slice/parut"],
+            cara: ["Buat sandwich.", "Panggang di teflon dengan mentega."]
+          },
+          {
+            id: 266, title: "Pizza Roti Tawar", hewan: "sosis", nabati: "", sayur: "tomat", karbo: "roti",
+            image: "https://images.unsplash.com/photo-1619623067140-5e5d3269a840?auto=format&fit=crop&w=800&q=80",
+            tags: ["Snack", "Pizza"], calories: 300, protein_val: 10, fat_val: 12, carbs_val: 35, price: "Rp 12.000",
+            desc: "Pizza mini praktis.", benefit: "Seru.",
+            ingredients: ["Roti tawar", "Saus tomat/bolognese", "Sosis", "Keju melt"],
+            cara: ["Oles saus di roti.", "Tata toping.", "Panggang di teflon tutup sebentar sampai keju leleh."]
+          },
+          {
+            id: 267, title: "Nasi Gila (Sosis Bakso)", hewan: "sosis", nabati: "", sayur: "kol", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1603133872878-684f108fd1f6?auto=format&fit=crop&w=800&q=80",
+            tags: ["Jajanan", "Malam"], calories: 500, protein_val: 18, fat_val: 20, carbs_val: 60, price: "Rp 15.000",
+            desc: "Tumisan sosis bakso pedas manis dimakan pakai nasi.", benefit: "Kenyang pol.",
+            ingredients: ["Nasi putih", "Sosis & Bakso iris", "Telur arik", "Kecap manis pedas"],
+            cara: ["Tumis semua bahan isian dengan kecap.", "Sajikan di atas nasi hangat."]
+          },
+          {
+            id: 270, title: "Bubur Ayam Rice Cooker", hewan: "ayam", nabati: "", sayur: "", karbo: "nasi",
+            image: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=800&q=80",
+            tags: ["Sarapan", "Sakit"], calories: 300, protein_val: 15, fat_val: 8, carbs_val: 45, price: "Rp 10.000",
+            desc: "Bubur ayam tanpa diaduk terus.", benefit: "Mudah.",
+            ingredients: ["Beras (cuci bersih)", "Air kaldu/banyak air", "Ayam (rebus bareng)", "Garam jahe"],
+            cara: ["Masak di rice cooker dengan air 4-5x lipat beras.", "Tunggu jadi bubur."]
+          }
+        ];
+
+        // --- 2. AI SERVICE ---
+        const API_KEY = ""; // Masukkan API Key Google Gemini Anda di sini jika ingin fitur AI aktif
+
+        const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+        const generateRecipeWithAI = async (ingredients) => {
+          if (!API_KEY) {
+            console.warn("No API Key found. AI feature disabled.");
+            alert("Fitur AI memerlukan API Key. Silakan tambahkan API Key di dalam kode (baris ~360).");
+            return null;
+          }
+
+          const ingredientList = ingredients.filter(i => i).join(", ");
+          const prompt = `
+            You are a professional chef specializing in cheap, healthy meals for college students (Anak Kost) in Indonesia.
+            Create a single creative recipe using these ingredients: ${ingredientList}.
+            You can assume they have basic seasonings (salt, sugar, oil, garlic, soy sauce).
+            Return the response in Indonesian (Bahasa Indonesia).
+            IMPORTANT: Provide the ingredients as a list of strings, not a single paragraph.
+          `;
+
+          try {
+            const response = await ai.models.generateContent({
+              model: "gemini-2.5-flash",
+              contents: prompt,
+              config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                  type: "OBJECT",
+                  properties: {
+                    title: { type: "STRING" },
+                    desc: { type: "STRING", description: "Short appetizing description (max 150 chars)" },
+                    tags: { 
+                        type: "ARRAY", 
+                        items: { type: "STRING" } 
+                    },
+                    calories: { type: "NUMBER" },
+                    protein_val: { type: "NUMBER" },
+                    fat_val: { type: "NUMBER" },
+                    carbs_val: { type: "NUMBER" },
+                    price: { type: "STRING", description: "Estimated price in IDR format e.g. Rp 15.000" },
+                    benefit: { type: "STRING", description: "Health benefit explanation" },
+                    ingredients: { 
+                        type: "ARRAY", 
+                        items: { type: "STRING" },
+                        description: "List of ingredients with quantities e.g. '2 butir telur'"
+                    },
+                    cara: { 
+                        type: "ARRAY", 
+                        items: { type: "STRING" },
+                        description: "Step by step cooking instructions"
+                    },
+                  },
+                  required: ["title", "desc", "calories", "protein_val", "fat_val", "carbs_val", "price", "ingredients", "cara"]
+                }
+              }
             });
 
-            if(filtered.length === 0) {
-                container.innerHTML = '<p style="text-align:center; width:100%; color:#666; padding: 50px 0;">🚫 Maaf, resep dengan kombinasi bahan atau keyword tersebut belum tersedia. Coba ganti satu atau dua bahan!</p>';
-                return;
+            if (response.text) {
+              const data = JSON.parse(response.text);
+              return {
+                id: `ai-${Date.now()}`,
+                hewan: "", nabati: "", sayur: "", karbo: "",
+                image: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80",
+                isAiGenerated: true,
+                ...data
+              };
             }
+            return null;
 
-            filtered.forEach(resep => {
-                const card = `
-                    <div class="recipe-card" onclick="showDetail(${resep.id})">
-                        <img src="${resep.image}" class="card-img" alt="${resep.title}">
-                        <div class="card-body">
-                            <span class="diet-tag">${resep.tags}</span>
-                            <h3 class="recipe-title">${resep.title}</h3>
-                            <p style="font-size:0.9rem; color:#666; margin-bottom:10px;">${resep.desc.substring(0, 60)}...</p>
-                            
-                            <div class="nutrition-info">
-                                <span>🔥 ${resep.calories} kkal</span>
-                                <span>💪 ${resep.protein_val}g Prot</span>
-                                <span>🍚 ${resep.carbs_val}g Karbo</span>
+          } catch (error) {
+            console.error("Gemini AI Error:", error);
+            return null;
+          }
+        };
+
+        // --- 3. COMPONENTS ---
+
+        const Navbar = ({ onHomeClick }) => {
+          const handleFeatureNotReady = (e, featureName) => {
+            e.preventDefault();
+            alert(`🚧 Maaf, fitur "${featureName}" masih dalam tahap pengembangan.\n\nNantikan update eksklusif selanjutnya dari Lisa Aliya!`);
+          };
+
+          return (
+            <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-stone-100">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center h-16">
+                  <div className="flex items-center gap-2 cursor-pointer group" onClick={onHomeClick}>
+                    <div className="bg-sage-100 p-1.5 rounded-lg group-hover:bg-sage-200 transition-colors">
+                        <ChefHat className="h-6 w-6 text-sage-600" />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-lg font-bold text-sage-600 tracking-tight leading-none group-hover:text-sage-800 transition-colors">NutriFind.</span>
+                        <span className="text-[10px] text-stone-500 font-medium tracking-wide">by Lisa Aliya</span>
+                    </div>
+                  </div>
+
+                  <nav className="flex items-center space-x-6">
+                    <a href="#" onClick={onHomeClick} className="hidden sm:block text-stone-600 hover:text-sage-600 font-medium transition-colors text-sm">Beranda</a>
+                    <a href="#" onClick={(e) => handleFeatureNotReady(e, "Resep Premium")} className="hidden sm:block text-stone-600 hover:text-sage-600 font-medium transition-colors text-sm">Resep Premium</a>
+                    <div onClick={(e) => handleFeatureNotReady(e, "Login Member")} className="flex items-center gap-2 text-stone-600 cursor-pointer hover:text-sage-600 bg-stone-100 px-3 py-1.5 rounded-full transition-colors hover:bg-sage-100">
+                        <User className="h-4 w-4" />
+                        <span className="text-xs font-bold">Masuk</span>
+                    </div>
+                  </nav>
+                </div>
+              </div>
+            </header>
+          );
+        };
+
+        const Hero = () => {
+          return (
+            <div className="relative bg-stone-900 overflow-hidden">
+              <div className="absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" alt="Healthy Food" className="w-full h-full object-cover opacity-30"/>
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/60 to-transparent"></div>
+              </div>
+              <div className="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8 text-center sm:text-left">
+                <div className="sm:max-w-2xl">
+                    <div className="inline-block px-4 py-1.5 mb-6 rounded-full bg-sage-500/20 border border-sage-500/30 backdrop-blur-sm">
+                        <span className="text-sage-100 font-semibold text-xs sm:text-sm tracking-wide uppercase">Karya Lisa Aliya • Solusi Anak Kost</span>
+                    </div>
+                    <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl mb-6">
+                    Cook Smarter,<br />
+                    <span className="text-sage-500">Live Healthier.</span>
+                    </h1>
+                    <p className="mt-4 text-lg sm:text-xl text-stone-300 max-w-lg leading-relaxed">
+                    Bingung mau masak apa dengan bahan sisa di kulkas? Masukkan bahan yang kamu punya, dan temukan inspirasi menu harian yang hemat, sehat, dan praktis.
+                    </p>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const RecipeCard = ({ recipe, onClick }) => {
+          return (
+            <div onClick={() => onClick(recipe)} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-sage-200/50 border border-stone-100 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer flex flex-col h-full">
+              <div className="relative h-52 overflow-hidden bg-stone-200">
+                <img src={recipe.image} alt={recipe.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+                
+                <div className="absolute top-3 left-3 flex gap-2 flex-wrap max-w-[80%]">
+                  {recipe.tags.slice(0, 2).map((tag, idx) => (
+                    <span key={idx} className="bg-white/95 backdrop-blur-md text-sage-800 text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm uppercase tracking-wide">{tag}</span>
+                  ))}
+                  {recipe.isAiGenerated && (
+                     <span className="bg-purple-600/90 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1 uppercase tracking-wide">
+                        <Sparkles size={10} /> AI Chef
+                     </span>
+                  )}
+                </div>
+                
+                <div className="absolute bottom-3 right-3">
+                     <span className="bg-orange-accent text-white text-xs font-bold px-3 py-1 rounded-full shadow-md border border-white/20">{recipe.price}</span>
+                </div>
+              </div>
+
+              <div className="p-5 flex-1 flex flex-col">
+                <h3 className="text-lg font-bold text-stone-800 mb-2 leading-tight group-hover:text-sage-700 transition-colors">{recipe.title}</h3>
+                <p className="text-stone-500 text-sm mb-5 line-clamp-2 flex-1">{recipe.desc}</p>
+
+                <div className="bg-stone-50/80 rounded-xl p-3 flex justify-between items-center text-xs font-semibold text-stone-600 mt-auto border border-stone-100">
+                  <div className="flex flex-col items-center gap-1">
+                    <Flame size={16} className="text-orange-accent" />
+                    <span>{recipe.calories} kkal</span>
+                  </div>
+                  <div className="w-px h-8 bg-stone-200/80"></div>
+                  <div className="flex flex-col items-center gap-1">
+                    <Activity size={16} className="text-blue-500" />
+                    <span>{recipe.protein_val}g Prot</span>
+                  </div>
+                  <div className="w-px h-8 bg-stone-200/80"></div>
+                  <div className="flex flex-col items-center gap-1">
+                    <Wheat size={16} className="text-amber-500" />
+                    <span>{recipe.carbs_val}g Karb</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const RecipeModal = ({ recipe, onClose }) => {
+          if (!recipe) return null;
+
+          return (
+            <div className="fixed inset-0 z-[100] overflow-y-auto" role="dialog" aria-modal="true">
+              <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200" onClick={onClose}></div>
+              <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div className="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-3xl animate-in zoom-in-95 duration-200">
+                  
+                  <button onClick={onClose} className="absolute top-4 right-4 z-20 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-colors backdrop-blur-sm">
+                    <X size={20} />
+                  </button>
+
+                  <div className="h-72 w-full relative group">
+                    <img src={recipe.image} alt={recipe.title} className="h-full w-full object-cover"/>
+                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/90 via-stone-900/40 to-transparent p-6 sm:p-8 flex flex-col justify-end">
+                       <div className="flex items-center gap-2 mb-3">
+                         {recipe.tags.map(tag => (
+                           <span key={tag} className="text-xs font-bold bg-sage-500/90 backdrop-blur-md text-white px-2.5 py-1 rounded shadow-lg">{tag}</span>
+                         ))}
+                       </div>
+                       <h2 className="text-2xl sm:text-4xl font-bold text-white mb-2 leading-tight shadow-sm">{recipe.title}</h2>
+                       <p className="text-stone-300 text-sm sm:text-base line-clamp-2 max-w-2xl">{recipe.desc}</p>
+                    </div>
+                  </div>
+
+                  <div className="p-6 sm:p-8 bg-white">
+                    <div className="mb-8 border-2 border-stone-800 rounded-lg p-4">
+                        <div className="flex justify-between items-end border-b-4 border-stone-800 pb-2 mb-2">
+                            <h3 className="font-black text-2xl text-stone-800">Informasi Nilai Gizi</h3>
+                            <span className="text-sm font-bold text-stone-600">Per Porsi</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm font-bold border-b border-stone-300 py-1">
+                            <span>Kalori</span>
+                            <span className="text-xl">{recipe.calories} kkal</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 mt-2 text-sm">
+                            <div className="flex flex-col">
+                                <span className="font-bold text-stone-800">Protein</span>
+                                <span className="text-stone-600">{recipe.protein_val}g</span>
                             </div>
-                            
-                            <div class="card-footer">
-                                <span class="price">Est. ${resep.price}</span>
-                                <a href="#" class="btn-detail" onclick="event.stopPropagation(); showDetail(${resep.id})">Lihat Resep ></a>
+                            <div className="flex flex-col border-l border-stone-300 pl-4">
+                                <span className="font-bold text-stone-800">Lemak</span>
+                                <span className="text-stone-600">{recipe.fat_val}g</span>
+                            </div>
+                            <div className="flex flex-col border-l border-stone-300 pl-4">
+                                <span className="font-bold text-stone-800">Karbohidrat</span>
+                                <span className="text-stone-600">{recipe.carbs_val}g</span>
                             </div>
                         </div>
                     </div>
-                `;
-                container.innerHTML += card;
-            });
-        }
 
-        function showDetail(id) {
-            const resep = recipes.find(r => r.id === id);
-            if (!resep) return;
+                    <div className="grid md:grid-cols-2 gap-10">
+                        <div className="space-y-8">
+                            <div className="bg-sage-50 rounded-xl p-5 border border-sage-100">
+                                <h3 className="flex items-center gap-2 text-lg font-bold text-sage-800 mb-3">
+                                    <Info size={20} className="text-sage-600"/> Manfaat Sehat
+                                </h3>
+                                <p className="text-sage-700 text-sm leading-relaxed">{recipe.benefit}</p>
+                            </div>
+                            <div>
+                                <h3 className="flex items-center gap-2 text-lg font-bold text-stone-800 mb-4 pb-2 border-b border-stone-100">
+                                    <ChefHat size={20} className="text-orange-accent"/> Bahan-bahan
+                                </h3>
+                                <ul className="space-y-3">
+                                   {recipe.ingredients.map((item, idx) => (
+                                     <li key={idx} className="flex items-start gap-3 group">
+                                        <div className="mt-1 min-w-[1.25rem]">
+                                          <CheckCircle2 size={16} className="text-sage-500 group-hover:text-sage-700" />
+                                        </div>
+                                        <span className="text-stone-700 text-sm font-medium group-hover:text-stone-900 transition-colors">{item}</span>
+                                     </li>
+                                   ))}
+                                </ul>
+                            </div>
+                        </div>
 
-            // Membangun konten Modal
-            const modalTitle = document.getElementById('modalTitle');
-            const modalBody = document.getElementById('modalBody');
-            
-            modalTitle.textContent = resep.title;
-            
-            modalBody.innerHTML = `
-                <p style="font-style: italic; color: var(--accent-orange); margin-top: -10px;">${resep.tags} | Budget: ${resep.price}</p>
-                
-                <h4>Ringkasan Gizi (Per Porsi)</h4>
-                <div class="nutrition-detail-box">
-                    <div>${resep.calories} kkal <span>Kalori</span></div>
-                    <div>${resep.protein_val}g <span>Protein</span></div>
-                    <div>${resep.carbs_val}g <span>Karbohidrat</span></div>
-                    <div>${resep.fat_val}g <span>Lemak</span></div>
+                        <div>
+                            <h3 className="flex items-center gap-2 text-lg font-bold text-stone-800 mb-4 pb-2 border-b border-stone-100">
+                                <Flame size={20} className="text-orange-accent"/> Cara Membuat
+                            </h3>
+                            <div className="space-y-6">
+                                {recipe.cara.map((step, idx) => (
+                                    <div key={idx} className="relative pl-8 group">
+                                        <span className="absolute left-0 top-0 flex items-center justify-center w-6 h-6 rounded-full bg-stone-100 text-stone-600 font-bold text-xs border border-stone-200 group-hover:bg-sage-500 group-hover:text-white group-hover:border-sage-500 transition-colors">
+                                            {idx + 1}
+                                        </span>
+                                        <p className="text-stone-700 text-sm leading-relaxed group-hover:text-stone-900 transition-colors">{step}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-10 pt-6 border-t border-stone-100 flex justify-between items-center bg-stone-50 -mx-6 -mb-6 sm:-mx-8 sm:-mb-8 p-6 rounded-b-2xl">
+                         <div className="flex flex-col">
+                            <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Estimasi Harga</span>
+                            <span className="text-orange-accent font-bold text-2xl">{recipe.price}</span>
+                         </div>
+                         <button className="flex items-center gap-2 px-6 py-3 bg-sage-600 text-white rounded-xl hover:bg-sage-700 transition-all shadow-lg shadow-sage-200 font-bold text-sm transform active:scale-95">
+                            <Heart size={18} /> Simpan Resep
+                         </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const FilterSelect = ({ label, value, options, onChange }) => (
+          <div className="relative group">
+            <label className="block text-xs font-bold text-stone-500 uppercase tracking-wide mb-1.5 ml-1">{label}</label>
+            <div className="relative">
+                <select 
+                    className="w-full appearance-none bg-stone-50 border border-stone-200 text-stone-700 py-3 px-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-transparent transition-all hover:border-sage-300 cursor-pointer font-medium text-sm shadow-sm"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                >
+                    <option value="">Pilih {label}...</option>
+                    {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-stone-400 group-hover:text-sage-600 transition-colors">
+                    <SlidersHorizontal size={16} />
+                </div>
+            </div>
+          </div>
+        );
+
+        const FilterBar = ({ filters, onFilterChange, onReset, resultCount }) => {
+          const hasActiveFilters = Object.values(filters).some(Boolean);
+
+          return (
+            <div className="bg-white rounded-3xl shadow-xl shadow-stone-200/50 p-6 sm:p-8 mb-10 border border-stone-100 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-sage-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none"></div>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 relative z-10">
+                    <div>
+                        <h2 className="text-2xl font-bold text-stone-800 tracking-tight">Isi Kulkas Kamu</h2>
+                        <p className="text-stone-500 mt-1 text-sm">Pilih bahan yang tersedia di dapurmu sekarang.</p>
+                    </div>
+                    {hasActiveFilters && (
+                        <button onClick={onReset} className="flex items-center gap-1.5 text-xs font-bold text-orange-accent hover:text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg transition-colors mt-3 md:mt-0">
+                            <RotateCcw size={14} /> Reset Filter
+                        </button>
+                    )}
                 </div>
 
-                <h4>Manfaat & Keunggulan</h4>
-                <p>${resep.benefit}</p>
-
-                <h4>Bahan-Bahan</h4>
-                <ul style="padding-left: 20px; list-style-type: square;">
-                    ${resep.bahan.split(',').map(b => `<li>${b.trim()}</li>`).join('')}
-                </ul>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 relative z-10">
+                    <FilterSelect label="Protein Hewani" value={filters.hewan} options={INGREDIENT_OPTIONS.hewan} onChange={(v) => onFilterChange('hewan', v)}/>
+                    <FilterSelect label="Protein Nabati" value={filters.nabati} options={INGREDIENT_OPTIONS.nabati} onChange={(v) => onFilterChange('nabati', v)}/>
+                    <FilterSelect label="Sayuran" value={filters.sayur} options={INGREDIENT_OPTIONS.sayur} onChange={(v) => onFilterChange('sayur', v)}/>
+                    <FilterSelect label="Karbohidrat" value={filters.karbo} options={INGREDIENT_OPTIONS.karbo} onChange={(v) => onFilterChange('karbo', v)}/>
+                </div>
                 
-                <h4>Cara Memasak</h4>
-                <ol style="padding-left: 20px;">
-                    ${resep.cara.split('. ').map(step => `<li>${step.trim().replace(/\.$/g, '')}</li>`).join('')}
-                </ol>
-            `;
+                <div className="mt-6 pt-4 border-t border-stone-100 flex items-center justify-between text-xs font-medium text-stone-400">
+                     <div className="flex items-center gap-2">
+                        <div className="p-1 bg-sage-100 rounded-md">
+                             <Search size={14} className="text-sage-600"/> 
+                        </div>
+                        <span>Ditemukan <strong className="text-stone-800 text-sm">{resultCount}</strong> resep cocok</span>
+                     </div>
+                     <span className="hidden sm:inline">Tips: Kombinasikan bahan untuk hasil lebih spesifik</span>
+                </div>
+            </div>
+          );
+        };
+
+        const EmptyState = ({ onAskAI }) => {
+          return (
+            <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-stone-200 hover:border-sage-200 transition-colors group">
+                <div className="bg-stone-50 p-6 rounded-full inline-block mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <Search size={48} className="text-stone-300 group-hover:text-sage-400 transition-colors" />
+                </div>
+                <h3 className="text-xl font-bold text-stone-800 mb-2">Belum ada resep yang pas</h3>
+                <p className="text-stone-500 max-w-md mx-auto mb-8 leading-relaxed">
+                    Database resep manual kami belum memiliki kombinasi persis ini. Tapi jangan khawatir, Chef AI Lisa siap membantu!
+                </p>
+                <button onClick={onAskAI} className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-purple-200 text-purple-700 font-bold rounded-xl hover:bg-purple-50 hover:border-purple-300 hover:shadow-lg transition-all shadow-sm">
+                    <Sparkles size={18} /> Minta Buatkan Resep Baru (AI)
+                </button>
+            </div>
+          );
+        };
+
+        const Footer = () => {
+          return (
+            <footer className="bg-stone-900 text-stone-400 py-16 mt-24">
+              <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                  <div>
+                    <h3 className="text-white font-bold text-lg mb-4">NutriFind by Lisa Aliya</h3>
+                    <p className="text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
+                        Membantu anak kost dan pejuang dapur hemat menciptakan hidangan lezat dan bergizi dari apa saja yang tersisa di kulkas.
+                    </p>
+                  </div>
+                  <div>
+                     <h4 className="text-white font-bold mb-4">Akses Cepat</h4>
+                     <ul className="space-y-2 text-sm">
+                        <li><a href="#" className="hover:text-white transition-colors">Cari Resep</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Langganan Premium</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Tentang Lisa Aliya</a></li>
+                     </ul>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold mb-4">Legal</h4>
+                     <ul className="space-y-2 text-sm">
+                        <li><a href="#" className="hover:text-white transition-colors">Kebijakan Privasi</a></li>
+                        <li><a href="#" className="hover:text-white transition-colors">Syarat & Ketentuan</a></li>
+                     </ul>
+                  </div>
+              </div>
+              <div className="max-w-7xl mx-auto px-4 mt-12 pt-8 border-t border-stone-800 text-center text-xs">
+                  <p>© 2024 NutriFind Inc. Dibuat dengan <Heart size={12} className="inline text-red-500 fill-current mx-1"/> oleh Lisa Aliya.</p>
+              </div>
+            </footer>
+          );
+        };
+
+        // --- 4. MAIN APP LOGIC ---
+
+        const ITEMS_PER_PAGE = 9;
+
+        const App = () => {
+          const [recipes, setRecipes] = useState(INITIAL_RECIPES);
+          const [selectedRecipe, setSelectedRecipe] = useState(null);
+          
+          const [filters, setFilters] = useState({
+            hewan: '', nabati: '', sayur: '', karbo: ''
+          });
+
+          const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+          const [isAiLoading, setIsAiLoading] = useState(false);
+          const [showAiError, setShowAiError] = useState(false);
+
+          const handleFilterChange = (key, value) => {
+            setFilters(prev => ({ ...prev, [key]: value }));
+            setVisibleCount(ITEMS_PER_PAGE);
+          };
+
+          const resetFilters = () => {
+            setFilters({hewan: '', nabati: '', sayur: '', karbo: ''});
+            setVisibleCount(ITEMS_PER_PAGE);
+          };
+
+          const handleHomeClick = () => {
+            resetFilters();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
+
+          const filteredRecipes = useMemo(() => {
+            const { hewan, nabati, sayur, karbo } = filters;
+            const hasSelection = hewan || nabati || sayur || karbo;
+
+            if (!hasSelection) return recipes;
+
+            const scoredRecipes = recipes.map(recipe => {
+                let score = 0;
+                if (hewan && recipe.hewan === hewan) score += 10;
+                if (nabati && recipe.nabati === nabati) score += 10;
+                if (sayur && recipe.sayur === sayur) score += 10;
+                if (karbo && recipe.karbo === karbo) score += 10;
+                return { ...recipe, matchScore: score };
+            });
+
+            return scoredRecipes
+                .filter(r => r.matchScore > 0)
+                .sort((a, b) => b.matchScore - a.matchScore);
+
+          }, [filters, recipes]);
+
+          const displayedRecipes = filteredRecipes.slice(0, visibleCount);
+          const hasMore = visibleCount < filteredRecipes.length;
+
+          const handleLoadMore = () => {
+            setVisibleCount(prev => prev + 6);
+          };
+
+          const handleAskAI = async () => {
+            setIsAiLoading(true);
+            setShowAiError(false);
             
-            document.getElementById('recipeModal').style.display = "block";
-        }
-        
-        function closeModal() {
-            document.getElementById('recipeModal').style.display = "none";
-        }
+            const ingredients = [
+                filters.hewan ? INGREDIENT_OPTIONS.hewan.find(i => i.value === filters.hewan)?.label : '',
+                filters.nabati ? INGREDIENT_OPTIONS.nabati.find(i => i.value === filters.nabati)?.label : '',
+                filters.sayur ? INGREDIENT_OPTIONS.sayur.find(i => i.value === filters.sayur)?.label : '',
+                filters.karbo ? INGREDIENT_OPTIONS.karbo.find(i => i.value === filters.karbo)?.label : '',
+            ].filter(Boolean);
 
-        // Load semua resep saat pertama buka
-        window.onload = function() {
-            cariResep(); 
-        }
-
-        // Tutup modal jika user tekan ESC
-        window.onkeydown = function(event) {
-            if (event.key === "Escape") {
-                closeModal();
+            if (ingredients.length === 0) {
+                alert("Pilih minimal satu bahan untuk bertanya pada Chef Lisa.");
+                setIsAiLoading(false);
+                return;
             }
-        }
+
+            const newRecipe = await generateRecipeWithAI(ingredients);
+
+            if (newRecipe) {
+                setRecipes(prev => [newRecipe, ...prev]);
+                setSelectedRecipe(newRecipe);
+            } else {
+                setShowAiError(true);
+            }
+            setIsAiLoading(false);
+          };
+
+          return (
+            <div className="min-h-screen bg-stone-50 font-sans selection:bg-sage-200 selection:text-sage-900">
+              <Navbar onHomeClick={handleHomeClick} />
+              <Hero />
+
+              <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 -mt-20 relative z-10">
+                
+                <FilterBar 
+                    filters={filters} 
+                    onFilterChange={handleFilterChange} 
+                    onReset={resetFilters}
+                    resultCount={filteredRecipes.length}
+                />
+
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-sage-100 rounded-lg text-sage-600">
+                            <ChefHat size={24} />
+                        </div>
+                        <h2 className="text-2xl font-bold text-stone-800 tracking-tight">
+                            {Object.values(filters).some(Boolean) ? 'Hasil Pencarian' : 'Rekomendasi Menu'}
+                        </h2>
+                    </div>
+                    
+                    <button 
+                        onClick={handleAskAI}
+                        disabled={isAiLoading}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white shadow-lg shadow-purple-200 transition-all transform hover:-translate-y-0.5 active:scale-95 text-sm ${
+                            isAiLoading 
+                            ? 'bg-purple-400 cursor-not-allowed' 
+                            : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700'
+                        }`}
+                    >
+                        {isAiLoading ? (
+                            <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                                Meracik Resep...
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles size={16} />
+                                Tanya Chef Lisa (AI)
+                            </>
+                        )}
+                    </button>
+                </div>
+
+                {showAiError && (
+                    <div className="mb-8 p-4 bg-red-50 text-red-700 text-sm rounded-xl border border-red-100 text-center font-medium animate-in fade-in slide-in-from-top-2">
+                        Gagal terhubung dengan Chef AI. Mohon cek koneksi atau API Key.
+                    </div>
+                )}
+
+                {displayedRecipes.length > 0 ? (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                            {displayedRecipes.map(recipe => (
+                                <RecipeCard 
+                                    key={recipe.id} 
+                                    recipe={recipe} 
+                                    onClick={setSelectedRecipe} 
+                                />
+                            ))}
+                        </div>
+                        
+                        {hasMore && (
+                            <div className="text-center">
+                                <button 
+                                    onClick={handleLoadMore}
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-stone-600 font-bold rounded-full border border-stone-200 hover:border-sage-400 hover:text-sage-600 hover:shadow-md transition-all group"
+                                >
+                                    Tampilkan Lebih Banyak
+                                    <ArrowDownCircle size={18} className="group-hover:translate-y-0.5 transition-transform"/>
+                                </button>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <EmptyState onAskAI={handleAskAI} />
+                )}
+
+              </main>
+
+              <Footer />
+              <RecipeModal recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} />
+            </div>
+          );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
